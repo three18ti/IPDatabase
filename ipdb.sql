@@ -4,7 +4,7 @@ BEGIN TRANSACTION;
 DROP TABLE IF EXISTS server;
 CREATE TABLE server (
     id INTEGER PRIMARY KEY,
-    server_name VARCHAR
+    name VARCHAR
 );
 
 DROP TABLE IF EXISTS ip;

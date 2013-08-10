@@ -32,7 +32,7 @@ plugins:
         connections:
             foo:
                 driver: SQLite
-                database: test.sqlite
+                database: ipdb.sqlite
     Auth::Extensible:
         realms:
             foo:

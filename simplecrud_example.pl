@@ -5,23 +5,6 @@ use Dancer::Plugin::SimpleCRUD;
 our $VERSION = '0.1';
 
 simple_crud(
-    db_connection_name  => 'foo',
-    record_title    => 'Server',
-    db_table        => 'server',
-    prefix          => '/server',
-    deleteable      => 'yes',
-    sortable        => 'yes',
-    downloadable    => 1,
-    foreign_keys    => {
-        server_ips  => {
-            table           => 'ip',
-            key_column      => 'id',
-            label_column    => 'ip',
-        }
-    },
-);
-
-simple_crud(
     record_title => 'Person',
     db_table => 'people',
     db_connection_name => 'foo',

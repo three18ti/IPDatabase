@@ -1,0 +1,19 @@
+/* get server name and ips */
+SELECT server.name, ip.ip
+FROM server
+LEFT JOIN server_ips ON server.id = server_ips.server_id
+LEFT JOIN ip on server_ips.ip_id = ip.id;
+
+/* Find server name based on IP */
+SELECT server.name
+FROM server
+LEFT JOIN server_ips ON server.id = server_ips.server_id
+LEFT JOIN ip on server_ips.ip_id = ip.id
+WHERE ip.ip = '192.168.0.2';
+
+
+/* get ip and subnet */
+SELECT ip.ip, subnet.prefix, subnet.netmask, subnet.network, subnet.gateway, subnet.broadcast
+FROM ip
+LEFT JOIN ip_subnet ON ip.id = ip_subnet.ip_id
+LEFT JOIN subnet ON ip_subnet.subnet_id = subnet.id;
