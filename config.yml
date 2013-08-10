@@ -26,6 +26,7 @@ template: "template_toolkit"
 #     start_tag: '[%'
 #     end_tag:   '%]'
 
+
 session: simple
 plugins:
     Database:
