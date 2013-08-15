@@ -1,0 +1,12 @@
+<% IF entries.size %>
+    <table>
+    <% FOREACH entry IN entries %>
+        <tr>
+            <td><a href="<% request.base %>view_server/<% entry.server.id %>"><% entry.server.name %></a></td>
+            <td><a href="<% request.base %>view_ip/<% entry.ip.id %>"><% entry.ip.ip %></a></td>
+        </tr>     
+    <% END %>
+    </table>
+<% ELSE %>
+    <li><em>Unbelievable.  No entries here so far</em>
+<% END %>

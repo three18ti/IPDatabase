@@ -14,9 +14,25 @@
 
 </head>
 <body>
-<% content %>
-<div id="footer">
-Powered by <a href="http://perldancer.org/">Dancer</a> <% dancer_version %>
-</div>
+    <div class=page>
+        <div class = metanav >
+            <% UNLESS session.logged_in %>
+                <a href = "<% request.base %>login">Log in</a>
+            <% ELSE %>
+                <a href = "<% request.base %>view_ip">View IPs</a>
+                <a href = "<% request.base %>logout">Log out</a>
+            <% END %>
+        </div>
+        <% IF flash.message %>
+            <div class = "flash"><% flash.message %></div>
+        <% END %>
+        <% IF flash.error %>
+            <div class = "error">Error: <% flash.error %></div>
+        <% END %>
+        <% content %>
+        <div id="footer">
+            Powered by <a href="http://perldancer.org/">Dancer</a> <% dancer_version %>
+        </div>
+    </div>
 </body>
 </html>

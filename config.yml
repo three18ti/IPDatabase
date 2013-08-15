@@ -18,22 +18,20 @@ charset: "UTF-8"
 # simple: default and very basic template engine
 # template_toolkit: TT
 
-#template: "simple"
-
 template: "template_toolkit"
 # engines:
 #   template_toolkit:
 #     start_tag: '[%'
 #     end_tag:   '%]'
 
+username: 'admin'
+password: 'password'
 
 session: simple
 plugins:
     Database:
-        connections:
-            foo:
-                driver: SQLite
-                database: ipdb.sqlite
+        driver: SQLite
+        database: ipdb.sqlite
     Auth::Extensible:
         realms:
             foo:

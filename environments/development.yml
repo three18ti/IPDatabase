@@ -25,3 +25,22 @@ show_errors: 1
 # DO NOT EVER USE THIS FEATURE IN PRODUCTION 
 # OR TINY KITTENS SHALL DIE WITH LOTS OF SUFFERING
 auto_reload: 0
+
+plack_middlewares:
+      -
+        - Debug
+        - panels
+        -
+          - Environment
+          - Dancer::TemplateVariables
+          - Dancer::Settings
+          - DBITrace
+          - DBIProfile
+          - PerlConfig
+          - Memory
+          - Timer
+          - Response
+          - Ajax
+          - DBIC::QueryLog
+          - TrackObjects
+          - TemplateToolkit

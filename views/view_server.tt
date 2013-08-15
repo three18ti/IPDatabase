@@ -1,0 +1,15 @@
+<h2><% server.name %></h2>
+<dl>
+    <dt>Server Name:</dt>
+    <dd><% server.name %></dd>
+    <dt>Comments:</dt>
+    <% IF server.comments %>
+        <dd><% server.comments %></dd>
+    <% ELSE %>
+        <dd>This server has no comments</dd>
+    <% END %>
+    <dt>IPs</dt>
+    <% FOREACH ip IN ips %>
+        <dd><% ip %></dd>
+    <% END %>
+</dl>
