@@ -1,4 +1,8 @@
 package IPDatabase;
+use Socket;
+use strict;
+use warnings;
+use Template::Stash;
 use Dancer ':syntax';
 use Dancer::Plugin::Database;
 use Dancer::Plugin::FlashMessage;
@@ -199,5 +203,14 @@ any ['get', 'post' ] => '/logout' => sub {
     flash message => 'You have been logged out.';
     redirect '/';
 };
+
+$Template::Stash::SCALAR_OPS->{ long2ip } = sub {
+    return inet_ntoa (pack ("N*", shift));    
+};
+
+sub ip2long {
+    return unpack("l*", pack("l*", unpack("N*", inet_aton( shift) )));
+}
+
 
 true;

@@ -6,8 +6,8 @@
     <li>Comments: <% subnet.comment %></li>
     <h2>IPs: </h2>
     <ul>
-        <% FOREACH ip IN ips.keys.sort %>
-            <li><% ips.$ip.ip %> <% ips.$ip.name %></li>
+        <% FOREACH ip IN ips.keys.nsort %>
+            <li><% ips.$ip.ip.long2ip %> <% ips.$ip.name %></li>
         <% END %>
     </ul>
 </ul>

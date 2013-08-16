@@ -1,0 +1,663 @@
+PRAGMA foreign_keys = ON;
+BEGIN TRANSACTION;
+
+DROP TABLE IF EXISTS server;
+CREATE TABLE server (
+    id          INTEGER PRIMARY KEY,
+    name        VARCHAR UNIQUE,
+    notes       VARCHAR
+);
+
+DROP TABLE IF EXISTS ip;
+CREATE TABLE ip (
+    id INTEGER PRIMARY KEY,
+    ip          INTEGER UNIQUE,
+    notes       VARCHAR
+);
+
+DROP TABLE IF EXISTS subnet;
+CREATE TABLE subnet (
+    id          INTEGER PRIMARY KEY,
+    network     VARCHAR UNIQUE,
+    gateway     VARCHAR UNIQUE,
+    broadcast   VARCHAR UNIQUE,
+    prefix      VARCHAR,
+    netmask     VARCHAR,
+    comment     VARCHAR
+);
+
+DROP TABLE IF EXISTS vlan;
+CREATE TABLE vlan (
+    id          INTEGER PRIMARY KEY,
+    vlan        INTEGER,
+    comment     VARCHAR,
+    notes       VARCHAR
+);
+
+DROP TABLE IF EXISTS vlan_subnets;
+CREATE TABLE vlan_subnets (
+    vlan_id     INTEGER,
+    subnet_id   INTEGER,
+    FOREIGN KEY(vlan_id)    REFERENCES vlan(id)     ON DELETE CASCADE,
+    FOREIGN KEY(subnet_id)  REFERENCES subnet(id)   ON DELETE CASCADE
+);
+
+
+DROP TABLE IF EXISTS ip_subnet;
+CREATE TABLE ip_subnet (
+    subnet_id   INTEGER,
+    ip_id       INTEGER,
+    FOREIGN KEY(subnet_id)  REFERENCES subnet(id)   ON DELETE CASCADE,
+    FOREIGN KEY(ip_id)      REFERENCES ip(id)       ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS server_ips;
+CREATE TABLE server_ips (
+    server_id   INTEGER,
+    ip_id       INTEGER,
+    FOREIGN KEY(server_id)  REFERENCES server(id)   ON DELETE CASCADE,
+    FOREIGN KEY(ip_id)      REFERENCES ip(id)       ON DELETE CASCADE
+);
+
+CREATE INDEX subnet_index       ON ip_subnet(subnet_id);
+CREATE INDEX ip_subnet_index    ON ip_subnet(ip_id);
+CREATE INDEX server_index       ON server_ips(server_id);
+CREATE INDEX ip_index           ON server_ips(ip_id);
+CREATE INDEX vlan_index         ON vlan_subnets(vlan_id);
+CREATE INDEX subnet_vlan_index  ON vlan_subnets(subnet_id);
+
+INSERT INTO "server" VALUES(1, 'abc-123', '' );
+INSERT INTO "server" VALUES(2, 'def-456', '' );
+INSERT INTO "server" VALUES(3, 'hij-654', '' );
+INSERT INTO "server" VALUES(4, 'zxc-576', '' );
+INSERT INTO "server" VALUES(5, 'fgh-753', '' );
+
+INSERT INTO "vlan" VALUES(1, 100, 'Foo',     '' ); 
+INSERT INTO "vlan" VALUES(2, 130, 'Public',  '' ); 
+INSERT INTO "vlan" VALUES(3, 131, 'Private', '' ); 
+
+INSERT INTO "ip" VALUES(1, '192.168.0.2', '' );
+INSERT INTO "ip" VALUES(2, '192.168.0.3', '' );
+INSERT INTO "ip" VALUES(3, '192.168.0.4', '' );
+INSERT INTO "ip" VALUES(4, '192.168.0.5', '' );
+INSERT INTO "ip" VALUES(5, '10.10.0.2', '' );
+INSERT INTO "ip" VALUES(6, '10.10.0.3', '' );
+INSERT INTO "ip" VALUES(7, '10.10.0.4', '' );
+INSERT INTO "ip" VALUES(8, '10.10.0.5', '' );
+INSERT INTO "ip" VALUES(9, '172.0.10.2', '' );
+INSERT INTO "ip" VALUES(10, '172.0.10.3', '' );
+INSERT INTO "ip" VALUES(11, '172.0.10.4', '' );
+INSERT INTO "ip" VALUES(12, '172.0.10.5', '' );
+
+INSERT INTO "subnet" VALUES(1, '192.168.0.0', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(2, '10.10.0.0', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(3, '172.0.10.0', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0', '');
+
+INSERT INTO "vlan_subnets" VALUES(1, 1);
+INSERT INTO "vlan_subnets" VALUES(1, 2);
+INSERT INTO "vlan_subnets" VALUES(2, 3);
+
+INSERT INTO "server_ips" VALUES(1, 1);
+INSERT INTO "server_ips" VALUES(2, 2);
+INSERT INTO "server_ips" VALUES(3, 3);
+INSERT INTO "server_ips" VALUES(3, 4);
+INSERT INTO "server_ips" VALUES(4, 5);
+INSERT INTO "server_ips" VALUES(4, 6);
+INSERT INTO "server_ips" VALUES(4, 7);
+INSERT INTO "server_ips" VALUES(4, 8);
+INSERT INTO "server_ips" VALUES(5, 9);
+INSERT INTO "server_ips" VALUES(5, 10);
+INSERT INTO "server_ips" VALUES(5, 11);
+INSERT INTO "server_ips" VALUES(5, 12);
+
+
+INSERT INTO "ip" VALUES(13, 192.168.0.6, '' );
+INSERT INTO "ip" VALUES(14, 192.168.0.7, '' );
+INSERT INTO "ip" VALUES(15, 192.168.0.8, '' );
+INSERT INTO "ip" VALUES(16, 192.168.0.9, '' );
+INSERT INTO "ip" VALUES(17, 192.168.0.10, '' );
+INSERT INTO "ip" VALUES(18, 192.168.0.11, '' );
+INSERT INTO "ip" VALUES(19, 192.168.0.12, '' );
+INSERT INTO "ip" VALUES(20, 192.168.0.13, '' );
+INSERT INTO "ip" VALUES(21, 192.168.0.14, '' );
+INSERT INTO "ip" VALUES(22, 192.168.0.15, '' );
+INSERT INTO "ip" VALUES(23, 192.168.0.16, '' );
+INSERT INTO "ip" VALUES(24, 192.168.0.17, '' );
+INSERT INTO "ip" VALUES(25, 192.168.0.18, '' );
+INSERT INTO "ip" VALUES(26, 192.168.0.19, '' );
+INSERT INTO "ip" VALUES(27, 192.168.0.20, '' );
+INSERT INTO "ip" VALUES(28, 192.168.0.21, '' );
+INSERT INTO "ip" VALUES(29, 192.168.0.22, '' );
+INSERT INTO "ip" VALUES(30, 192.168.0.23, '' );
+INSERT INTO "ip" VALUES(31, 192.168.0.24, '' );
+INSERT INTO "ip" VALUES(32, 192.168.0.25, '' );
+INSERT INTO "ip" VALUES(33, 192.168.0.26, '' );
+INSERT INTO "ip" VALUES(34, 192.168.0.27, '' );
+INSERT INTO "ip" VALUES(35, 192.168.0.28, '' );
+INSERT INTO "ip" VALUES(36, 192.168.0.29, '' );
+INSERT INTO "ip" VALUES(37, 192.168.0.30, '' );
+INSERT INTO "ip" VALUES(38, 192.168.0.31, '' );
+INSERT INTO "ip" VALUES(39, 192.168.0.32, '' );
+INSERT INTO "ip" VALUES(40, 192.168.0.33, '' );
+INSERT INTO "ip" VALUES(41, 192.168.0.34, '' );
+INSERT INTO "ip" VALUES(42, 192.168.0.35, '' );
+INSERT INTO "ip" VALUES(43, 192.168.0.36, '' );
+INSERT INTO "ip" VALUES(44, 192.168.0.37, '' );
+INSERT INTO "ip" VALUES(45, 192.168.0.38, '' );
+INSERT INTO "ip" VALUES(46, 192.168.0.39, '' );
+INSERT INTO "ip" VALUES(47, 192.168.0.40, '' );
+INSERT INTO "ip" VALUES(48, 192.168.0.41, '' );
+INSERT INTO "ip" VALUES(49, 192.168.0.42, '' );
+INSERT INTO "ip" VALUES(50, 192.168.0.43, '' );
+INSERT INTO "ip" VALUES(51, 192.168.0.44, '' );
+INSERT INTO "ip" VALUES(52, 192.168.0.45, '' );
+INSERT INTO "ip" VALUES(53, 192.168.0.46, '' );
+INSERT INTO "ip" VALUES(54, 192.168.0.47, '' );
+INSERT INTO "ip" VALUES(55, 192.168.0.48, '' );
+INSERT INTO "ip" VALUES(56, 192.168.0.49, '' );
+INSERT INTO "ip" VALUES(57, 192.168.0.50, '' );
+INSERT INTO "ip" VALUES(58, 192.168.0.51, '' );
+INSERT INTO "ip" VALUES(59, 192.168.0.52, '' );
+INSERT INTO "ip" VALUES(60, 192.168.0.53, '' );
+INSERT INTO "ip" VALUES(61, 192.168.0.54, '' );
+INSERT INTO "ip" VALUES(62, 192.168.0.55, '' );
+INSERT INTO "ip" VALUES(63, 192.168.0.56, '' );
+INSERT INTO "ip" VALUES(64, 192.168.0.57, '' );
+INSERT INTO "ip" VALUES(65, 192.168.0.58, '' );
+INSERT INTO "ip" VALUES(66, 192.168.0.59, '' );
+INSERT INTO "ip" VALUES(67, 192.168.0.60, '' );
+INSERT INTO "ip" VALUES(68, 192.168.0.61, '' );
+INSERT INTO "ip" VALUES(69, 192.168.0.62, '' );
+INSERT INTO "ip" VALUES(70, 192.168.0.63, '' );
+INSERT INTO "ip" VALUES(71, 192.168.0.64, '' );
+INSERT INTO "ip" VALUES(72, 192.168.0.65, '' );
+INSERT INTO "ip" VALUES(73, 192.168.0.66, '' );
+INSERT INTO "ip" VALUES(74, 192.168.0.67, '' );
+INSERT INTO "ip" VALUES(75, 192.168.0.68, '' );
+INSERT INTO "ip" VALUES(76, 192.168.0.69, '' );
+INSERT INTO "ip" VALUES(77, 192.168.0.70, '' );
+INSERT INTO "ip" VALUES(78, 192.168.0.71, '' );
+INSERT INTO "ip" VALUES(79, 192.168.0.72, '' );
+INSERT INTO "ip" VALUES(80, 192.168.0.73, '' );
+INSERT INTO "ip" VALUES(81, 192.168.0.74, '' );
+INSERT INTO "ip" VALUES(82, 192.168.0.75, '' );
+INSERT INTO "ip" VALUES(83, 192.168.0.76, '' );
+INSERT INTO "ip" VALUES(84, 192.168.0.77, '' );
+INSERT INTO "ip" VALUES(85, 192.168.0.78, '' );
+INSERT INTO "ip" VALUES(86, 192.168.0.79, '' );
+INSERT INTO "ip" VALUES(87, 192.168.0.80, '' );
+INSERT INTO "ip" VALUES(88, 192.168.0.81, '' );
+INSERT INTO "ip" VALUES(89, 192.168.0.82, '' );
+INSERT INTO "ip" VALUES(90, 192.168.0.83, '' );
+INSERT INTO "ip" VALUES(91, 192.168.0.84, '' );
+INSERT INTO "ip" VALUES(92, 192.168.0.85, '' );
+INSERT INTO "ip" VALUES(93, 192.168.0.86, '' );
+INSERT INTO "ip" VALUES(94, 192.168.0.87, '' );
+INSERT INTO "ip" VALUES(95, 192.168.0.88, '' );
+INSERT INTO "ip" VALUES(96, 192.168.0.89, '' );
+INSERT INTO "ip" VALUES(97, 192.168.0.90, '' );
+INSERT INTO "ip" VALUES(98, 192.168.0.91, '' );
+INSERT INTO "ip" VALUES(99, 192.168.0.92, '' );
+INSERT INTO "ip" VALUES(100, 192.168.0.93, '' );
+INSERT INTO "ip" VALUES(101, 192.168.0.94, '' );
+INSERT INTO "ip" VALUES(102, 192.168.0.95, '' );
+INSERT INTO "ip" VALUES(103, 192.168.0.96, '' );
+INSERT INTO "ip" VALUES(104, 192.168.0.97, '' );
+INSERT INTO "ip" VALUES(105, 192.168.0.98, '' );
+INSERT INTO "ip" VALUES(106, 192.168.0.99, '' );
+INSERT INTO "ip" VALUES(107, 192.168.0.100, '' );
+INSERT INTO "ip" VALUES(108, 192.168.0.101, '' );
+INSERT INTO "ip" VALUES(109, 192.168.0.102, '' );
+INSERT INTO "ip" VALUES(110, 192.168.0.103, '' );
+INSERT INTO "ip" VALUES(111, 192.168.0.104, '' );
+INSERT INTO "ip" VALUES(112, 192.168.0.105, '' );
+INSERT INTO "ip" VALUES(113, 192.168.0.106, '' );
+INSERT INTO "ip" VALUES(114, 192.168.0.107, '' );
+INSERT INTO "ip" VALUES(115, 192.168.0.108, '' );
+INSERT INTO "ip" VALUES(116, 192.168.0.109, '' );
+INSERT INTO "ip" VALUES(117, 192.168.0.110, '' );
+INSERT INTO "ip" VALUES(118, 192.168.0.111, '' );
+INSERT INTO "ip" VALUES(119, 192.168.0.112, '' );
+INSERT INTO "ip" VALUES(120, 192.168.0.113, '' );
+INSERT INTO "ip" VALUES(121, 192.168.0.114, '' );
+INSERT INTO "ip" VALUES(122, 192.168.0.115, '' );
+INSERT INTO "ip" VALUES(123, 192.168.0.116, '' );
+INSERT INTO "ip" VALUES(124, 192.168.0.117, '' );
+INSERT INTO "ip" VALUES(125, 192.168.0.118, '' );
+INSERT INTO "ip" VALUES(126, 192.168.0.119, '' );
+INSERT INTO "ip" VALUES(127, 192.168.0.120, '' );
+INSERT INTO "ip" VALUES(128, 192.168.0.121, '' );
+INSERT INTO "ip" VALUES(129, 192.168.0.122, '' );
+INSERT INTO "ip" VALUES(130, 192.168.0.123, '' );
+INSERT INTO "ip" VALUES(131, 192.168.0.124, '' );
+INSERT INTO "ip" VALUES(132, 192.168.0.125, '' );
+INSERT INTO "ip" VALUES(133, 192.168.0.126, '' );
+INSERT INTO "ip" VALUES(134, 192.168.0.127, '' );
+INSERT INTO "ip" VALUES(135, 192.168.0.128, '' );
+INSERT INTO "ip" VALUES(136, 192.168.0.129, '' );
+INSERT INTO "ip" VALUES(137, 192.168.0.130, '' );
+INSERT INTO "ip" VALUES(138, 192.168.0.131, '' );
+INSERT INTO "ip" VALUES(139, 192.168.0.132, '' );
+INSERT INTO "ip" VALUES(140, 192.168.0.133, '' );
+INSERT INTO "ip" VALUES(141, 192.168.0.134, '' );
+INSERT INTO "ip" VALUES(142, 192.168.0.135, '' );
+INSERT INTO "ip" VALUES(143, 192.168.0.136, '' );
+INSERT INTO "ip" VALUES(144, 192.168.0.137, '' );
+INSERT INTO "ip" VALUES(145, 192.168.0.138, '' );
+INSERT INTO "ip" VALUES(146, 192.168.0.139, '' );
+INSERT INTO "ip" VALUES(147, 192.168.0.140, '' );
+INSERT INTO "ip" VALUES(148, 192.168.0.141, '' );
+INSERT INTO "ip" VALUES(149, 192.168.0.142, '' );
+INSERT INTO "ip" VALUES(150, 192.168.0.143, '' );
+INSERT INTO "ip" VALUES(151, 192.168.0.144, '' );
+INSERT INTO "ip" VALUES(152, 192.168.0.145, '' );
+INSERT INTO "ip" VALUES(153, 192.168.0.146, '' );
+INSERT INTO "ip" VALUES(154, 192.168.0.147, '' );
+INSERT INTO "ip" VALUES(155, 192.168.0.148, '' );
+INSERT INTO "ip" VALUES(156, 192.168.0.149, '' );
+INSERT INTO "ip" VALUES(157, 192.168.0.150, '' );
+INSERT INTO "ip" VALUES(158, 192.168.0.151, '' );
+INSERT INTO "ip" VALUES(159, 192.168.0.152, '' );
+INSERT INTO "ip" VALUES(160, 192.168.0.153, '' );
+INSERT INTO "ip" VALUES(161, 192.168.0.154, '' );
+INSERT INTO "ip" VALUES(162, 192.168.0.155, '' );
+INSERT INTO "ip" VALUES(163, 192.168.0.156, '' );
+INSERT INTO "ip" VALUES(164, 192.168.0.157, '' );
+INSERT INTO "ip" VALUES(165, 192.168.0.158, '' );
+INSERT INTO "ip" VALUES(166, 192.168.0.159, '' );
+INSERT INTO "ip" VALUES(167, 192.168.0.160, '' );
+INSERT INTO "ip" VALUES(168, 192.168.0.161, '' );
+INSERT INTO "ip" VALUES(169, 192.168.0.162, '' );
+INSERT INTO "ip" VALUES(170, 192.168.0.163, '' );
+INSERT INTO "ip" VALUES(171, 192.168.0.164, '' );
+INSERT INTO "ip" VALUES(172, 192.168.0.165, '' );
+INSERT INTO "ip" VALUES(173, 192.168.0.166, '' );
+INSERT INTO "ip" VALUES(174, 192.168.0.167, '' );
+INSERT INTO "ip" VALUES(175, 192.168.0.168, '' );
+INSERT INTO "ip" VALUES(176, 192.168.0.169, '' );
+INSERT INTO "ip" VALUES(177, 192.168.0.170, '' );
+INSERT INTO "ip" VALUES(178, 192.168.0.171, '' );
+INSERT INTO "ip" VALUES(179, 192.168.0.172, '' );
+INSERT INTO "ip" VALUES(180, 192.168.0.173, '' );
+INSERT INTO "ip" VALUES(181, 192.168.0.174, '' );
+INSERT INTO "ip" VALUES(182, 192.168.0.175, '' );
+INSERT INTO "ip" VALUES(183, 192.168.0.176, '' );
+INSERT INTO "ip" VALUES(184, 192.168.0.177, '' );
+INSERT INTO "ip" VALUES(185, 192.168.0.178, '' );
+INSERT INTO "ip" VALUES(186, 192.168.0.179, '' );
+INSERT INTO "ip" VALUES(187, 192.168.0.180, '' );
+INSERT INTO "ip" VALUES(188, 192.168.0.181, '' );
+INSERT INTO "ip" VALUES(189, 192.168.0.182, '' );
+INSERT INTO "ip" VALUES(190, 192.168.0.183, '' );
+INSERT INTO "ip" VALUES(191, 192.168.0.184, '' );
+INSERT INTO "ip" VALUES(192, 192.168.0.185, '' );
+INSERT INTO "ip" VALUES(193, 192.168.0.186, '' );
+INSERT INTO "ip" VALUES(194, 192.168.0.187, '' );
+INSERT INTO "ip" VALUES(195, 192.168.0.188, '' );
+INSERT INTO "ip" VALUES(196, 192.168.0.189, '' );
+INSERT INTO "ip" VALUES(197, 192.168.0.190, '' );
+INSERT INTO "ip" VALUES(198, 192.168.0.191, '' );
+INSERT INTO "ip" VALUES(199, 192.168.0.192, '' );
+INSERT INTO "ip" VALUES(200, 192.168.0.193, '' );
+INSERT INTO "ip" VALUES(201, 192.168.0.194, '' );
+INSERT INTO "ip" VALUES(202, 192.168.0.195, '' );
+INSERT INTO "ip" VALUES(203, 192.168.0.196, '' );
+INSERT INTO "ip" VALUES(204, 192.168.0.197, '' );
+INSERT INTO "ip" VALUES(205, 192.168.0.198, '' );
+INSERT INTO "ip" VALUES(206, 192.168.0.199, '' );
+INSERT INTO "ip" VALUES(207, 192.168.0.200, '' );
+INSERT INTO "ip" VALUES(208, 192.168.0.201, '' );
+INSERT INTO "ip" VALUES(209, 192.168.0.202, '' );
+INSERT INTO "ip" VALUES(210, 192.168.0.203, '' );
+INSERT INTO "ip" VALUES(211, 192.168.0.204, '' );
+INSERT INTO "ip" VALUES(212, 192.168.0.205, '' );
+INSERT INTO "ip" VALUES(213, 192.168.0.206, '' );
+INSERT INTO "ip" VALUES(214, 192.168.0.207, '' );
+INSERT INTO "ip" VALUES(215, 192.168.0.208, '' );
+INSERT INTO "ip" VALUES(216, 192.168.0.209, '' );
+INSERT INTO "ip" VALUES(217, 192.168.0.210, '' );
+INSERT INTO "ip" VALUES(218, 192.168.0.211, '' );
+INSERT INTO "ip" VALUES(219, 192.168.0.212, '' );
+INSERT INTO "ip" VALUES(220, 192.168.0.213, '' );
+INSERT INTO "ip" VALUES(221, 192.168.0.214, '' );
+INSERT INTO "ip" VALUES(222, 192.168.0.215, '' );
+INSERT INTO "ip" VALUES(223, 192.168.0.216, '' );
+INSERT INTO "ip" VALUES(224, 192.168.0.217, '' );
+INSERT INTO "ip" VALUES(225, 192.168.0.218, '' );
+INSERT INTO "ip" VALUES(226, 192.168.0.219, '' );
+INSERT INTO "ip" VALUES(227, 192.168.0.220, '' );
+INSERT INTO "ip" VALUES(228, 192.168.0.221, '' );
+INSERT INTO "ip" VALUES(229, 192.168.0.222, '' );
+INSERT INTO "ip" VALUES(230, 192.168.0.223, '' );
+INSERT INTO "ip" VALUES(231, 192.168.0.224, '' );
+INSERT INTO "ip" VALUES(232, 192.168.0.225, '' );
+INSERT INTO "ip" VALUES(233, 192.168.0.226, '' );
+INSERT INTO "ip" VALUES(234, 192.168.0.227, '' );
+INSERT INTO "ip" VALUES(235, 192.168.0.228, '' );
+INSERT INTO "ip" VALUES(236, 192.168.0.229, '' );
+INSERT INTO "ip" VALUES(237, 192.168.0.230, '' );
+INSERT INTO "ip" VALUES(238, 192.168.0.231, '' );
+INSERT INTO "ip" VALUES(239, 192.168.0.232, '' );
+INSERT INTO "ip" VALUES(240, 192.168.0.233, '' );
+INSERT INTO "ip" VALUES(241, 192.168.0.234, '' );
+INSERT INTO "ip" VALUES(242, 192.168.0.235, '' );
+INSERT INTO "ip" VALUES(243, 192.168.0.236, '' );
+INSERT INTO "ip" VALUES(244, 192.168.0.237, '' );
+INSERT INTO "ip" VALUES(245, 192.168.0.238, '' );
+INSERT INTO "ip" VALUES(246, 192.168.0.239, '' );
+INSERT INTO "ip" VALUES(247, 192.168.0.240, '' );
+INSERT INTO "ip" VALUES(248, 192.168.0.241, '' );
+INSERT INTO "ip" VALUES(249, 192.168.0.242, '' );
+INSERT INTO "ip" VALUES(250, 192.168.0.243, '' );
+INSERT INTO "ip" VALUES(251, 192.168.0.244, '' );
+INSERT INTO "ip" VALUES(252, 192.168.0.245, '' );
+INSERT INTO "ip" VALUES(253, 192.168.0.246, '' );
+INSERT INTO "ip" VALUES(254, 192.168.0.247, '' );
+INSERT INTO "ip" VALUES(255, 192.168.0.248, '' );
+INSERT INTO "ip" VALUES(256, 192.168.0.249, '' );
+INSERT INTO "ip" VALUES(257, 192.168.0.250, '' );
+INSERT INTO "ip" VALUES(258, 192.168.0.251, '' );
+INSERT INTO "ip" VALUES(259, 192.168.0.252, '' );
+INSERT INTO "ip" VALUES(260, 192.168.0.253, '' );
+INSERT INTO "ip" VALUES(261, 192.168.0.254, '' );
+INSERT INTO "ip" VALUES(262, 192.168.0.255, '' );
+
+INSERT INTO "ip_subnet" VALUES(1, 1);
+INSERT INTO "ip_subnet" VALUES(1, 2);
+INSERT INTO "ip_subnet" VALUES(1, 3);
+INSERT INTO "ip_subnet" VALUES(1, 4);
+INSERT INTO "ip_subnet" VALUES(2, 5);
+INSERT INTO "ip_subnet" VALUES(2, 6);
+INSERT INTO "ip_subnet" VALUES(2, 7);
+INSERT INTO "ip_subnet" VALUES(2, 8);
+INSERT INTO "ip_subnet" VALUES(3, 9);
+INSERT INTO "ip_subnet" VALUES(3, 10);
+INSERT INTO "ip_subnet" VALUES(3, 11);
+INSERT INTO "ip_subnet" VALUES(3, 12);
+
+INSERT INTO "ip_subnet" VALUES(1, 13);
+INSERT INTO "ip_subnet" VALUES(1, 14);
+INSERT INTO "ip_subnet" VALUES(1, 15);
+INSERT INTO "ip_subnet" VALUES(1, 16);
+INSERT INTO "ip_subnet" VALUES(1, 17);
+INSERT INTO "ip_subnet" VALUES(1, 18);
+INSERT INTO "ip_subnet" VALUES(1, 19);
+INSERT INTO "ip_subnet" VALUES(1, 20);
+INSERT INTO "ip_subnet" VALUES(1, 21);
+INSERT INTO "ip_subnet" VALUES(1, 22);
+INSERT INTO "ip_subnet" VALUES(1, 23);
+INSERT INTO "ip_subnet" VALUES(1, 24);
+INSERT INTO "ip_subnet" VALUES(1, 25);
+INSERT INTO "ip_subnet" VALUES(1, 26);
+INSERT INTO "ip_subnet" VALUES(1, 27);
+INSERT INTO "ip_subnet" VALUES(1, 28);
+INSERT INTO "ip_subnet" VALUES(1, 29);
+INSERT INTO "ip_subnet" VALUES(1, 30);
+INSERT INTO "ip_subnet" VALUES(1, 31);
+INSERT INTO "ip_subnet" VALUES(1, 32);
+INSERT INTO "ip_subnet" VALUES(1, 33);
+INSERT INTO "ip_subnet" VALUES(1, 34);
+INSERT INTO "ip_subnet" VALUES(1, 35);
+INSERT INTO "ip_subnet" VALUES(1, 36);
+INSERT INTO "ip_subnet" VALUES(1, 37);
+INSERT INTO "ip_subnet" VALUES(1, 38);
+INSERT INTO "ip_subnet" VALUES(1, 39);
+INSERT INTO "ip_subnet" VALUES(1, 40);
+INSERT INTO "ip_subnet" VALUES(1, 41);
+INSERT INTO "ip_subnet" VALUES(1, 42);
+INSERT INTO "ip_subnet" VALUES(1, 43);
+INSERT INTO "ip_subnet" VALUES(1, 44);
+INSERT INTO "ip_subnet" VALUES(1, 45);
+INSERT INTO "ip_subnet" VALUES(1, 46);
+INSERT INTO "ip_subnet" VALUES(1, 47);
+INSERT INTO "ip_subnet" VALUES(1, 48);
+INSERT INTO "ip_subnet" VALUES(1, 49);
+INSERT INTO "ip_subnet" VALUES(1, 50);
+INSERT INTO "ip_subnet" VALUES(1, 51);
+INSERT INTO "ip_subnet" VALUES(1, 52);
+INSERT INTO "ip_subnet" VALUES(1, 53);
+INSERT INTO "ip_subnet" VALUES(1, 54);
+INSERT INTO "ip_subnet" VALUES(1, 55);
+INSERT INTO "ip_subnet" VALUES(1, 56);
+INSERT INTO "ip_subnet" VALUES(1, 57);
+INSERT INTO "ip_subnet" VALUES(1, 58);
+INSERT INTO "ip_subnet" VALUES(1, 59);
+INSERT INTO "ip_subnet" VALUES(1, 60);
+INSERT INTO "ip_subnet" VALUES(1, 61);
+INSERT INTO "ip_subnet" VALUES(1, 62);
+INSERT INTO "ip_subnet" VALUES(1, 63);
+INSERT INTO "ip_subnet" VALUES(1, 64);
+INSERT INTO "ip_subnet" VALUES(1, 65);
+INSERT INTO "ip_subnet" VALUES(1, 66);
+INSERT INTO "ip_subnet" VALUES(1, 67);
+INSERT INTO "ip_subnet" VALUES(1, 68);
+INSERT INTO "ip_subnet" VALUES(1, 69);
+INSERT INTO "ip_subnet" VALUES(1, 70);
+INSERT INTO "ip_subnet" VALUES(1, 71);
+INSERT INTO "ip_subnet" VALUES(1, 72);
+INSERT INTO "ip_subnet" VALUES(1, 73);
+INSERT INTO "ip_subnet" VALUES(1, 74);
+INSERT INTO "ip_subnet" VALUES(1, 75);
+INSERT INTO "ip_subnet" VALUES(1, 76);
+INSERT INTO "ip_subnet" VALUES(1, 77);
+INSERT INTO "ip_subnet" VALUES(1, 78);
+INSERT INTO "ip_subnet" VALUES(1, 79);
+INSERT INTO "ip_subnet" VALUES(1, 80);
+INSERT INTO "ip_subnet" VALUES(1, 81);
+INSERT INTO "ip_subnet" VALUES(1, 82);
+INSERT INTO "ip_subnet" VALUES(1, 83);
+INSERT INTO "ip_subnet" VALUES(1, 84);
+INSERT INTO "ip_subnet" VALUES(1, 85);
+INSERT INTO "ip_subnet" VALUES(1, 86);
+INSERT INTO "ip_subnet" VALUES(1, 87);
+INSERT INTO "ip_subnet" VALUES(1, 88);
+INSERT INTO "ip_subnet" VALUES(1, 89);
+INSERT INTO "ip_subnet" VALUES(1, 90);
+INSERT INTO "ip_subnet" VALUES(1, 91);
+INSERT INTO "ip_subnet" VALUES(1, 92);
+INSERT INTO "ip_subnet" VALUES(1, 93);
+INSERT INTO "ip_subnet" VALUES(1, 94);
+INSERT INTO "ip_subnet" VALUES(1, 95);
+INSERT INTO "ip_subnet" VALUES(1, 96);
+INSERT INTO "ip_subnet" VALUES(1, 97);
+INSERT INTO "ip_subnet" VALUES(1, 98);
+INSERT INTO "ip_subnet" VALUES(1, 99);
+INSERT INTO "ip_subnet" VALUES(1, 100);
+INSERT INTO "ip_subnet" VALUES(1, 101);
+INSERT INTO "ip_subnet" VALUES(1, 102);
+INSERT INTO "ip_subnet" VALUES(1, 103);
+INSERT INTO "ip_subnet" VALUES(1, 104);
+INSERT INTO "ip_subnet" VALUES(1, 105);
+INSERT INTO "ip_subnet" VALUES(1, 106);
+INSERT INTO "ip_subnet" VALUES(1, 107);
+INSERT INTO "ip_subnet" VALUES(1, 108);
+INSERT INTO "ip_subnet" VALUES(1, 109);
+INSERT INTO "ip_subnet" VALUES(1, 110);
+INSERT INTO "ip_subnet" VALUES(1, 111);
+INSERT INTO "ip_subnet" VALUES(1, 112);
+INSERT INTO "ip_subnet" VALUES(1, 113);
+INSERT INTO "ip_subnet" VALUES(1, 114);
+INSERT INTO "ip_subnet" VALUES(1, 115);
+INSERT INTO "ip_subnet" VALUES(1, 116);
+INSERT INTO "ip_subnet" VALUES(1, 117);
+INSERT INTO "ip_subnet" VALUES(1, 118);
+INSERT INTO "ip_subnet" VALUES(1, 119);
+INSERT INTO "ip_subnet" VALUES(1, 120);
+INSERT INTO "ip_subnet" VALUES(1, 121);
+INSERT INTO "ip_subnet" VALUES(1, 122);
+INSERT INTO "ip_subnet" VALUES(1, 123);
+INSERT INTO "ip_subnet" VALUES(1, 124);
+INSERT INTO "ip_subnet" VALUES(1, 125);
+INSERT INTO "ip_subnet" VALUES(1, 126);
+INSERT INTO "ip_subnet" VALUES(1, 127);
+INSERT INTO "ip_subnet" VALUES(1, 128);
+INSERT INTO "ip_subnet" VALUES(1, 129);
+INSERT INTO "ip_subnet" VALUES(1, 130);
+INSERT INTO "ip_subnet" VALUES(1, 131);
+INSERT INTO "ip_subnet" VALUES(1, 132);
+INSERT INTO "ip_subnet" VALUES(1, 133);
+INSERT INTO "ip_subnet" VALUES(1, 134);
+INSERT INTO "ip_subnet" VALUES(1, 135);
+INSERT INTO "ip_subnet" VALUES(1, 136);
+INSERT INTO "ip_subnet" VALUES(1, 137);
+INSERT INTO "ip_subnet" VALUES(1, 138);
+INSERT INTO "ip_subnet" VALUES(1, 139);
+INSERT INTO "ip_subnet" VALUES(1, 140);
+INSERT INTO "ip_subnet" VALUES(1, 141);
+INSERT INTO "ip_subnet" VALUES(1, 142);
+INSERT INTO "ip_subnet" VALUES(1, 143);
+INSERT INTO "ip_subnet" VALUES(1, 144);
+INSERT INTO "ip_subnet" VALUES(1, 145);
+INSERT INTO "ip_subnet" VALUES(1, 146);
+INSERT INTO "ip_subnet" VALUES(1, 147);
+INSERT INTO "ip_subnet" VALUES(1, 148);
+INSERT INTO "ip_subnet" VALUES(1, 149);
+INSERT INTO "ip_subnet" VALUES(1, 150);
+INSERT INTO "ip_subnet" VALUES(1, 151);
+INSERT INTO "ip_subnet" VALUES(1, 152);
+INSERT INTO "ip_subnet" VALUES(1, 153);
+INSERT INTO "ip_subnet" VALUES(1, 154);
+INSERT INTO "ip_subnet" VALUES(1, 155);
+INSERT INTO "ip_subnet" VALUES(1, 156);
+INSERT INTO "ip_subnet" VALUES(1, 157);
+INSERT INTO "ip_subnet" VALUES(1, 158);
+INSERT INTO "ip_subnet" VALUES(1, 159);
+INSERT INTO "ip_subnet" VALUES(1, 160);
+INSERT INTO "ip_subnet" VALUES(1, 161);
+INSERT INTO "ip_subnet" VALUES(1, 162);
+INSERT INTO "ip_subnet" VALUES(1, 163);
+INSERT INTO "ip_subnet" VALUES(1, 164);
+INSERT INTO "ip_subnet" VALUES(1, 165);
+INSERT INTO "ip_subnet" VALUES(1, 166);
+INSERT INTO "ip_subnet" VALUES(1, 167);
+INSERT INTO "ip_subnet" VALUES(1, 168);
+INSERT INTO "ip_subnet" VALUES(1, 169);
+INSERT INTO "ip_subnet" VALUES(1, 170);
+INSERT INTO "ip_subnet" VALUES(1, 171);
+INSERT INTO "ip_subnet" VALUES(1, 172);
+INSERT INTO "ip_subnet" VALUES(1, 173);
+INSERT INTO "ip_subnet" VALUES(1, 174);
+INSERT INTO "ip_subnet" VALUES(1, 175);
+INSERT INTO "ip_subnet" VALUES(1, 176);
+INSERT INTO "ip_subnet" VALUES(1, 177);
+INSERT INTO "ip_subnet" VALUES(1, 178);
+INSERT INTO "ip_subnet" VALUES(1, 179);
+INSERT INTO "ip_subnet" VALUES(1, 180);
+INSERT INTO "ip_subnet" VALUES(1, 181);
+INSERT INTO "ip_subnet" VALUES(1, 182);
+INSERT INTO "ip_subnet" VALUES(1, 183);
+INSERT INTO "ip_subnet" VALUES(1, 184);
+INSERT INTO "ip_subnet" VALUES(1, 185);
+INSERT INTO "ip_subnet" VALUES(1, 186);
+INSERT INTO "ip_subnet" VALUES(1, 187);
+INSERT INTO "ip_subnet" VALUES(1, 188);
+INSERT INTO "ip_subnet" VALUES(1, 189);
+INSERT INTO "ip_subnet" VALUES(1, 190);
+INSERT INTO "ip_subnet" VALUES(1, 191);
+INSERT INTO "ip_subnet" VALUES(1, 192);
+INSERT INTO "ip_subnet" VALUES(1, 193);
+INSERT INTO "ip_subnet" VALUES(1, 194);
+INSERT INTO "ip_subnet" VALUES(1, 195);
+INSERT INTO "ip_subnet" VALUES(1, 196);
+INSERT INTO "ip_subnet" VALUES(1, 197);
+INSERT INTO "ip_subnet" VALUES(1, 198);
+INSERT INTO "ip_subnet" VALUES(1, 199);
+INSERT INTO "ip_subnet" VALUES(1, 200);
+INSERT INTO "ip_subnet" VALUES(1, 201);
+INSERT INTO "ip_subnet" VALUES(1, 202);
+INSERT INTO "ip_subnet" VALUES(1, 203);
+INSERT INTO "ip_subnet" VALUES(1, 204);
+INSERT INTO "ip_subnet" VALUES(1, 205);
+INSERT INTO "ip_subnet" VALUES(1, 206);
+INSERT INTO "ip_subnet" VALUES(1, 207);
+INSERT INTO "ip_subnet" VALUES(1, 208);
+INSERT INTO "ip_subnet" VALUES(1, 209);
+INSERT INTO "ip_subnet" VALUES(1, 210);
+INSERT INTO "ip_subnet" VALUES(1, 211);
+INSERT INTO "ip_subnet" VALUES(1, 212);
+INSERT INTO "ip_subnet" VALUES(1, 213);
+INSERT INTO "ip_subnet" VALUES(1, 214);
+INSERT INTO "ip_subnet" VALUES(1, 215);
+INSERT INTO "ip_subnet" VALUES(1, 216);
+INSERT INTO "ip_subnet" VALUES(1, 217);
+INSERT INTO "ip_subnet" VALUES(1, 218);
+INSERT INTO "ip_subnet" VALUES(1, 219);
+INSERT INTO "ip_subnet" VALUES(1, 220);
+INSERT INTO "ip_subnet" VALUES(1, 221);
+INSERT INTO "ip_subnet" VALUES(1, 222);
+INSERT INTO "ip_subnet" VALUES(1, 223);
+INSERT INTO "ip_subnet" VALUES(1, 224);
+INSERT INTO "ip_subnet" VALUES(1, 225);
+INSERT INTO "ip_subnet" VALUES(1, 226);
+INSERT INTO "ip_subnet" VALUES(1, 227);
+INSERT INTO "ip_subnet" VALUES(1, 228);
+INSERT INTO "ip_subnet" VALUES(1, 229);
+INSERT INTO "ip_subnet" VALUES(1, 230);
+INSERT INTO "ip_subnet" VALUES(1, 231);
+INSERT INTO "ip_subnet" VALUES(1, 232);
+INSERT INTO "ip_subnet" VALUES(1, 233);
+INSERT INTO "ip_subnet" VALUES(1, 234);
+INSERT INTO "ip_subnet" VALUES(1, 235);
+INSERT INTO "ip_subnet" VALUES(1, 236);
+INSERT INTO "ip_subnet" VALUES(1, 237);
+INSERT INTO "ip_subnet" VALUES(1, 238);
+INSERT INTO "ip_subnet" VALUES(1, 239);
+INSERT INTO "ip_subnet" VALUES(1, 240);
+INSERT INTO "ip_subnet" VALUES(1, 241);
+INSERT INTO "ip_subnet" VALUES(1, 242);
+INSERT INTO "ip_subnet" VALUES(1, 243);
+INSERT INTO "ip_subnet" VALUES(1, 244);
+INSERT INTO "ip_subnet" VALUES(1, 245);
+INSERT INTO "ip_subnet" VALUES(1, 246);
+INSERT INTO "ip_subnet" VALUES(1, 247);
+INSERT INTO "ip_subnet" VALUES(1, 248);
+INSERT INTO "ip_subnet" VALUES(1, 249);
+INSERT INTO "ip_subnet" VALUES(1, 250);
+INSERT INTO "ip_subnet" VALUES(1, 251);
+INSERT INTO "ip_subnet" VALUES(1, 252);
+INSERT INTO "ip_subnet" VALUES(1, 253);
+INSERT INTO "ip_subnet" VALUES(1, 254);
+INSERT INTO "ip_subnet" VALUES(1, 255);
+INSERT INTO "ip_subnet" VALUES(1, 256);
+INSERT INTO "ip_subnet" VALUES(1, 257);
+INSERT INTO "ip_subnet" VALUES(1, 258);
+INSERT INTO "ip_subnet" VALUES(1, 259);
+INSERT INTO "ip_subnet" VALUES(1, 260);
+INSERT INTO "ip_subnet" VALUES(1, 261);
+INSERT INTO "ip_subnet" VALUES(1, 262);
+
+COMMIT;
+
+
+/* get server name and ips */
+SELECT server.name, ip.ip
+FROM server
+LEFT JOIN server_ips ON server.id = server_ips.server_id
+LEFT JOIN ip on server_ips.ip_id = ip.id;
+
+/* Find server name based on IP */
+SELECT server.name
+FROM server
+LEFT JOIN server_ips ON server.id = server_ips.server_id
+LEFT JOIN ip on server_ips.ip_id = ip.id
+WHERE ip.ip = '192.168.0.2';
+
+/* get ip and subnet */
+SELECT ip.ip, subnet.network, subnet.gateway, subnet.broadcast, subnet.prefix, subnet.netmask
+FROM ip
+LEFT JOIN ip_subnet ON ip.id = ip_subnet.ip_id
+LEFT JOIN subnet ON ip_subnet.subnet_id = subnet.id;
+
+/* Get Vlans and IP addresses */
+SELECT vlan.vlan, subnet.network
+FROM vlan
+LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id
+LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id;
+
+/* Select IPs subnets and VLANs */
+SELECT ip.ip, subnet.network, subnet.gateway, subnet.broadcast, vlan.vlan
+FROM ip
+LEFT JOIN ip_subnet ON ip.id = ip_subnet.ip_id
+LEFT JOIN subnet ON ip_subnet.subnet_id = subnet.id
+LEFT JOIN vlan_subnets ON subnet.id = vlan_subnets.subnet_id
+LEFT JOIN vlan ON vlan_subnets.vlan_id = vlan.id;

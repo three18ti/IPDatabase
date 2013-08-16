@@ -76,6 +76,7 @@ INSERT INTO "vlan" VALUES(1, 100, 'Foo',     '' );
 INSERT INTO "vlan" VALUES(2, 130, 'Public',  '' ); 
 INSERT INTO "vlan" VALUES(3, 131, 'Private', '' ); 
 
+/*
 INSERT INTO "ip" VALUES(1, '192.168.0.2', '' );
 INSERT INTO "ip" VALUES(2, '192.168.0.3', '' );
 INSERT INTO "ip" VALUES(3, '192.168.0.4', '' );
@@ -88,6 +89,7 @@ INSERT INTO "ip" VALUES(9, '172.0.10.2', '' );
 INSERT INTO "ip" VALUES(10, '172.0.10.3', '' );
 INSERT INTO "ip" VALUES(11, '172.0.10.4', '' );
 INSERT INTO "ip" VALUES(12, '172.0.10.5', '' );
+*/
 
 INSERT INTO "subnet" VALUES(1, '192.168.0.0', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
 INSERT INTO "subnet" VALUES(2, '10.10.0.0', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
@@ -97,6 +99,7 @@ INSERT INTO "vlan_subnets" VALUES(1, 1);
 INSERT INTO "vlan_subnets" VALUES(1, 2);
 INSERT INTO "vlan_subnets" VALUES(2, 3);
 
+/*
 INSERT INTO "ip_subnet" VALUES(1, 1);
 INSERT INTO "ip_subnet" VALUES(1, 2);
 INSERT INTO "ip_subnet" VALUES(1, 3);
@@ -109,7 +112,9 @@ INSERT INTO "ip_subnet" VALUES(3, 9);
 INSERT INTO "ip_subnet" VALUES(3, 10);
 INSERT INTO "ip_subnet" VALUES(3, 11);
 INSERT INTO "ip_subnet" VALUES(3, 12);
+*/
 
+/*
 INSERT INTO "server_ips" VALUES(1, 1);
 INSERT INTO "server_ips" VALUES(2, 2);
 INSERT INTO "server_ips" VALUES(3, 3);
@@ -122,39 +127,4 @@ INSERT INTO "server_ips" VALUES(5, 9);
 INSERT INTO "server_ips" VALUES(5, 10);
 INSERT INTO "server_ips" VALUES(5, 11);
 INSERT INTO "server_ips" VALUES(5, 12);
-
-COMMIT;
-
-
-/* get server name and ips */
-SELECT server.name, ip.ip
-FROM server
-LEFT JOIN server_ips ON server.id = server_ips.server_id
-LEFT JOIN ip on server_ips.ip_id = ip.id;
-
-/* Find server name based on IP */
-SELECT server.name
-FROM server
-LEFT JOIN server_ips ON server.id = server_ips.server_id
-LEFT JOIN ip on server_ips.ip_id = ip.id
-WHERE ip.ip = '192.168.0.2';
-
-/* get ip and subnet */
-SELECT ip.ip, subnet.network, subnet.gateway, subnet.broadcast, subnet.prefix, subnet.netmask
-FROM ip
-LEFT JOIN ip_subnet ON ip.id = ip_subnet.ip_id
-LEFT JOIN subnet ON ip_subnet.subnet_id = subnet.id;
-
-/* Get Vlans and IP addresses */
-SELECT vlan.vlan, subnet.network
-FROM vlan
-LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id
-LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id;
-
-/* Select IPs subnets and VLANs */
-SELECT ip.ip, subnet.network, subnet.gateway, subnet.broadcast, vlan.vlan
-FROM ip
-LEFT JOIN ip_subnet ON ip.id = ip_subnet.ip_id
-LEFT JOIN subnet ON ip_subnet.subnet_id = subnet.id
-LEFT JOIN vlan_subnets ON subnet.id = vlan_subnets.subnet_id
-LEFT JOIN vlan ON vlan_subnets.vlan_id = vlan.id;
+*/
