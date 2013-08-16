@@ -22,13 +22,16 @@ CREATE TABLE subnet (
     gateway     VARCHAR UNIQUE,
     broadcast   VARCHAR UNIQUE,
     prefix      VARCHAR,
-    netmask     VARCHAR
+    netmask     VARCHAR,
+    comment     VARCHAR
 );
 
 DROP TABLE IF EXISTS vlan;
 CREATE TABLE vlan (
     id          INTEGER PRIMARY KEY,
-    vlan        INTEGER
+    vlan        INTEGER,
+    comment     VARCHAR,
+    notes       VARCHAR
 );
 
 DROP TABLE IF EXISTS vlan_subnets;
@@ -69,9 +72,9 @@ INSERT INTO "server" VALUES(3, 'hij-654', '' );
 INSERT INTO "server" VALUES(4, 'zxc-576', '' );
 INSERT INTO "server" VALUES(5, 'fgh-753', '' );
 
-INSERT INTO "vlan" VALUES(1, 100); 
-INSERT INTO "vlan" VALUES(2, 130); 
-INSERT INTO "vlan" VALUES(3, 131); 
+INSERT INTO "vlan" VALUES(1, 100, 'Foo',     '' ); 
+INSERT INTO "vlan" VALUES(2, 130, 'Public',  '' ); 
+INSERT INTO "vlan" VALUES(3, 131, 'Private', '' ); 
 
 INSERT INTO "ip" VALUES(1, '192.168.0.2', '' );
 INSERT INTO "ip" VALUES(2, '192.168.0.3', '' );
@@ -86,9 +89,9 @@ INSERT INTO "ip" VALUES(10, '172.0.10.3', '' );
 INSERT INTO "ip" VALUES(11, '172.0.10.4', '' );
 INSERT INTO "ip" VALUES(12, '172.0.10.5', '' );
 
-INSERT INTO "subnet" VALUES(1, '192.168.0.0', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0');
-INSERT INTO "subnet" VALUES(2, '10.10.0.0', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0');
-INSERT INTO "subnet" VALUES(3, '172.0.10.0', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0');
+INSERT INTO "subnet" VALUES(1, '192.168.0.0', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(2, '10.10.0.0', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(3, '172.0.10.0', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0', '');
 
 INSERT INTO "vlan_subnets" VALUES(1, 1);
 INSERT INTO "vlan_subnets" VALUES(1, 2);

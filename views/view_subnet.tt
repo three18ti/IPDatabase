@@ -1,0 +1,13 @@
+<h2>Subnet <% subnet.network %><% subnet.prefix %></h2>
+<ul>
+    <li><em>Gateway:</em> <% subnet.gateway %></li>
+    <li>Netmask:<% subnet.netmask %>
+    <li><em>Broadcast:</em> <% subnet.broadcast %></li>
+    <li>Comments: <% subnet.comment %></li>
+    <h2>IPs: </h2>
+    <ul>
+        <% FOREACH ip IN ips.keys.sort %>
+            <li><% ips.$ip.ip %> <% ips.$ip.name %></li>
+        <% END %>
+    </ul>
+</ul>

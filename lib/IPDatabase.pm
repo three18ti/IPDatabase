@@ -11,32 +11,109 @@ get '/' => sub {
 };
 
 get '/overview' => sub {
-    my $vlan_sql = 'SELECT vlan from vlan';
+    # get subnet info
+    my $subnet_sql =  'SELECT vlan.vlan, subnet.id, subnet.network, subnet.prefix '
+                    . 'FROM vlan '
+                    . 'LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id '
+                    . 'LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id';
+    my $subnet_sth = database->prepare($subnet_sql);
+    $subnet_sth->execute or die $subnet_sth->errstr;
+    my $subnets = {};
+#    while ( my ($vlan, $subnet_id, $network, $prefix, $gateway, $broadcast, $netmask) 
+    while ( my ($vlan, $subnet_id, $network, $prefix, )  = $subnet_sth->fetchrow_array ) {
+        push @{$subnets->{$vlan}}, { 
+            id          => $subnet_id, 
+            prefix      => $prefix, 
+            network     => $network, 
+#            gateway     => $gateway,
+#            netmask     => $netmask,
+#            broadcast   => $broadcast,
+        };
+    }  
+
+    # Get vlan info
+    my $vlan_sql = 'SELECT id, vlan, comment from vlan';
     my $vlan_sth = database->prepare( $vlan_sql );
     $vlan_sth->execute or die $vlan_sth->errstr;
     my $vlans = ();
-    while ( my $entry = $vlan_sth->fetchrow_array ) {
-        push @$vlans, $entry;
+
+    while ( my ($vlan_id, $vlan, $comment) = $vlan_sth->fetchrow_array ) {
+        push @$vlans, { 
+            id => $vlan_id, 
+            name => $vlan, 
+            comment => $comment,
+            subnets => \@{$subnets->{$vlan}}
+        };
     }
 
-#    while ( my $entry = $vlan_sth->fetchrow_array ) {
-#        push @$vlans, $entry;
-#    }
-#    my $var = $vlan_sth->fetchall_arrayref;
-#    map { push @$vlans, shift } @$var;
-#    while ( my ($entry) = $vlan_sth->fetchall_arrayref ) {
-#    while ( my ($entry) = $vlan_sth->fetch ) {
-#        push @$vlans, shift $entry;
-#        push @$vlans, $entry;
-#    }
-
-#    map { push @$vlans, $_ } $vlan_sth->fetchall_arrayref;
-#    $vlans = shift @$vlans;
-#    @$vlans = map { shift $_ } @$vlans;
-
-#    push @$vlans, $_ while $vlan_sth->fetchall_arrayref;
-
     template 'overview.tt' => { vlans => $vlans };    
+};
+
+get '/view_vlan/:vlan_id' => sub {
+    my $vlan_id = params->{'vlan_id'};
+    # get vlan name
+    my $vlan_sql = 'SELECT vlan.vlan, vlan.comment FROM vlan WHERE vlan.id = ?';
+    my $vlan_sth = database->prepare($vlan_sql);
+    $vlan_sth->execute( $vlan_id ) or die $vlan_sth->errstr;
+    my ($vlan_name, $comment) = $vlan_sth->fetchrow_array;
+    my $vlan = { vlan => $vlan_name, comment => $comment };
+
+    # get subnet info
+    my $subnet_sql =  'SELECT subnet.id, subnet.network, subnet.prefix, '
+                    . 'subnet.gateway, subnet.broadcast, subnet.netmask, subnet.comment '
+                    . 'FROM vlan '
+                    . 'LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id '
+                    . 'LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id '
+                    . 'WHERE vlan.id = ?';
+    my $subnet_sth = database->prepare($subnet_sql);
+    $subnet_sth->execute( $vlan_id ) or die $subnet_sth->errstr;
+    my $subnets = ();
+    while ( my ($subnet_id, $network, $prefix, $gateway, $broadcast, $netmask, $comment)
+                                                        = $subnet_sth->fetchrow_array ) {
+        push @{$subnets}, {
+            id          => $subnet_id,
+            prefix      => $prefix,
+            network     => $network,
+            gateway     => $gateway,
+            netmask     => $netmask,
+            broadcast   => $broadcast,
+            comment     => $comment,
+        };
+    }
+
+    template 'view_vlan.tt' => {
+        vlan    => $vlan,
+        subnets => $subnets,
+    };
+};
+
+get '/view_subnet/:subnet_id' => sub {
+    my $subnet_id = params->{'subnet_id'};
+
+    # get subnet information
+    my $subnet_sql = 'SELECT subnet.network, subnet.gateway, subnet.broadcast, subnet.prefix, '
+                    . 'subnet.netmask, subnet.comment '
+                    . 'FROM subnet '
+                    . 'WHERE subnet.id = ?';
+    my $subnet_sth = database->prepare( $subnet_sql );
+    $subnet_sth->execute( $subnet_id ) or die $subnet_sth->errstr;
+    my $subnet = $subnet_sth->fetchrow_hashref;
+    
+    # get ips
+    my $ips_sql = 'SELECT ip.ip, server.name '
+                    . 'FROM ip_subnet '
+                    . 'LEFT JOIN ip ON ip_subnet.ip_id = ip.id '
+                    . 'LEFT JOIN server_ips ON ip.id = server_ips.ip_id '
+                    . 'LEFT JOIN server ON server_ips.server_id = server.id '
+                    . 'WHERE ip_subnet.subnet_id = ?';
+    my $ips_sth = database->prepare( $ips_sql );
+    $ips_sth->execute( $subnet_id ) or die $ips_sth->errstr;
+#    my $ips = $ips_sth->fetchall_hashref( 'ip.ip' );
+
+    template 'view_subnet.tt' => {
+        subnet  => $subnet,
+        ips     => $ips_sth->fetchall_hashref( 'ip' ),
+    };
 };
 
 get '/view_ip' => sub {
@@ -78,7 +155,7 @@ get '/view_server/:server_id' => sub {
     my $server_id = params->{'server_id'};
 
     # Get server name
-    my $server_sql = 'SELECT server.name FROM server WHERE server.id = ?';
+    my $server_sql = 'SELECT server.name, server.comments FROM server WHERE server.id = ?';
     my $name_sth = database->prepare( $server_sql );
     $name_sth->execute( $server_id );
     my ($server_name, $comments) = $name_sth->fetchrow_array;

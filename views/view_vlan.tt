@@ -1,0 +1,18 @@
+<dl>
+    <dt>VLAN: <% vlan.vlan %></dy>
+    <dd>Comment: <% vlan.comment %></dd>
+<% FOREACH subnet IN subnets %>
+    <br />
+    <dt>Subnet: <a href="<% request.base %>view_subnet/<% subnet.id %>"><% subnet.network %><% subnet.prefix %></a></dt>
+    <dd>
+        <dl>
+            <dt>Comments: </dt>
+            <dd><% subnet.comment %></dd>
+        </dl>
+    </dd>
+    <dd>Gateway: <% subnet.gateway %></dd>
+    <dd>Netmask: <% subnet.netmask %></dd>
+    <dd>Network: <% subnet.network %></dd>
+    <dd>Broadcast: <% subnet.broadcast %> </dd>
+<% END %>
+</dl>
