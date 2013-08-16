@@ -15,10 +15,20 @@ get '/overview' => sub {
     my $vlan_sth = database->prepare( $vlan_sql );
     $vlan_sth->execute or die $vlan_sth->errstr;
     my $vlans = ();
-
-    while ( my ($entry) = $vlan_sth->fetchall_arrayref ) {
-        push @$vlans, shift $entry;
+    while ( my $entry = $vlan_sth->fetchrow_array ) {
+        push @$vlans, $entry;
     }
+
+#    while ( my $entry = $vlan_sth->fetchrow_array ) {
+#        push @$vlans, $entry;
+#    }
+#    my $var = $vlan_sth->fetchall_arrayref;
+#    map { push @$vlans, shift } @$var;
+#    while ( my ($entry) = $vlan_sth->fetchall_arrayref ) {
+#    while ( my ($entry) = $vlan_sth->fetch ) {
+#        push @$vlans, shift $entry;
+#        push @$vlans, $entry;
+#    }
 
 #    map { push @$vlans, $_ } $vlan_sth->fetchall_arrayref;
 #    $vlans = shift @$vlans;
