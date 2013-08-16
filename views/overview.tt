@@ -1,0 +1,3 @@
+<% FOREACH vlan IN vlans %>
+<% vlan %><br />
+<% END %>

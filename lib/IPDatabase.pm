@@ -10,6 +10,25 @@ get '/' => sub {
 #    redirect '/people';
 };
 
+get '/overview' => sub {
+    my $vlan_sql = 'SELECT vlan from vlan';
+    my $vlan_sth = database->prepare( $vlan_sql );
+    $vlan_sth->execute or die $vlan_sth->errstr;
+    my $vlans = ();
+
+    while ( my ($entry) = $vlan_sth->fetchall_arrayref ) {
+        push @$vlans, shift $entry;
+    }
+
+#    map { push @$vlans, $_ } $vlan_sth->fetchall_arrayref;
+#    $vlans = shift @$vlans;
+#    @$vlans = map { shift $_ } @$vlans;
+
+#    push @$vlans, $_ while $vlan_sth->fetchall_arrayref;
+
+    template 'overview.tt' => { vlans => $vlans };    
+};
+
 get '/view_ip' => sub {
     my $sql = 'SELECT server.id, server.name, ip.id, ip.ip FROM server LEFT JOIN server_ips ON server.id = server_ips.server_id LEFT JOIN ip on server_ips.ip_id = ip.id';
     my $sth = database->prepare( $sql );

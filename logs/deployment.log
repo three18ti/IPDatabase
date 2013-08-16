@@ -1,0 +1,1 @@
+[3075] debug @0.001926> [hit #1]Adding sqlite_unicode to DBI connection params to enable UTF-8 support in /usr/local/share/perl/5.14.2/Dancer/Plugin/Database.pm l. 28
