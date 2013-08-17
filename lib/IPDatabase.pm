@@ -74,10 +74,15 @@ get '/view_vlan/:vlan_id' => sub {
     };
     my $subnet_sth = database->prepare($subnet_sql);
     $subnet_sth->execute( $vlan_id ) or die $subnet_sth->errstr;
+    my $subnets = ();
+    while (my $row = $subnet_sth->fetchrow_hashref) {
+        push @{$subnets}, $row;
+    }
+    @{$subnets} = sort { $a->{network} cmp $b->{network} } @{$subnets};
 
     template 'view_vlan.tt' => {
         vlan    => $vlan_sth->fetchrow_hashref,
-        subnets => $subnet_sth->fetchall_hashref,
+        subnets => $subnets,
     };
 };
 
