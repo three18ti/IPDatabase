@@ -18,7 +18,7 @@ CREATE TABLE ip (
 DROP TABLE IF EXISTS subnet;
 CREATE TABLE subnet (
     id          INTEGER PRIMARY KEY,
-    network     VARCHAR UNIQUE,
+    network     INTEGER UNIQUE,
     gateway     VARCHAR UNIQUE,
     broadcast   VARCHAR UNIQUE,
     prefix      VARCHAR,
@@ -89,9 +89,9 @@ INSERT INTO "ip" VALUES(10, -1409283581, '' );
 INSERT INTO "ip" VALUES(11, -1409283580, '' );
 INSERT INTO "ip" VALUES(12, -1409283579, '' );
 
-INSERT INTO "subnet" VALUES(1, '192.168.0.0', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
-INSERT INTO "subnet" VALUES(2, '10.10.0.0', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
-INSERT INTO "subnet" VALUES(3, '172.0.10.0', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(1, '-1062731773', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(2, '168427522', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(3, '-1409283581', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0', '');
 
 INSERT INTO "vlan_subnets" VALUES(1, 1);
 INSERT INTO "vlan_subnets" VALUES(1, 2);

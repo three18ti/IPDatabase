@@ -1,4 +1,4 @@
-<h2>Subnet <% subnet.network %><% subnet.prefix %></h2>
+<h2>Subnet <% subnet.network.long2ip %><% subnet.prefix %></h2>
 <ul>
     <li>Comments: <% subnet.comment %></li>
     <li><em>Gateway:</em> <% subnet.gateway %></li>
