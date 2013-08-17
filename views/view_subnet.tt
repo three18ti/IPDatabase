@@ -1,13 +1,14 @@
 <h2>Subnet <% subnet.network %><% subnet.prefix %></h2>
 <ul>
+    <li>Comments: <% subnet.comment %></li>
     <li><em>Gateway:</em> <% subnet.gateway %></li>
     <li>Netmask:<% subnet.netmask %>
     <li><em>Broadcast:</em> <% subnet.broadcast %></li>
-    <li>Comments: <% subnet.comment %></li>
     <h2>IPs: </h2>
     <ul>
         <% FOREACH ip IN ips.keys.nsort %>
-            <li><% ips.$ip.ip.long2ip %> <% ips.$ip.name %></li>
+            <li><a href="<% request.base %>view_ip/<% ips.$ip.id %>"><% ips.$ip.ip.long2ip %></a>
+                <a href="<% request.base %>view_server/<% ips.$ip.server_id %>"><% ips.$ip.name %></a></li>
         <% END %>
     </ul>
 </ul>

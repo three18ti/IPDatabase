@@ -16,10 +16,12 @@ get '/' => sub {
 
 get '/overview' => sub {
     # get subnet info
-    my $subnet_sql =  'SELECT vlan.vlan, subnet.id, subnet.network, subnet.prefix '
-                    . 'FROM vlan '
-                    . 'LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id '
-                    . 'LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id';
+    my $subnet_sql =  qq{
+                    SELECT vlan.vlan, subnet.id, subnet.network, subnet.prefix 
+                    FROM vlan
+                    LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id
+                    LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id
+    };
     my $subnet_sth = database->prepare($subnet_sql);
     $subnet_sth->execute or die $subnet_sth->errstr;
     my $subnets = {};
@@ -56,19 +58,21 @@ get '/overview' => sub {
 get '/view_vlan/:vlan_id' => sub {
     my $vlan_id = params->{'vlan_id'};
     # get vlan name
-    my $vlan_sql = 'SELECT vlan.vlan, vlan.comment FROM vlan WHERE vlan.id = ?';
+    my $vlan_sql = qq{ SELECT vlan.vlan, vlan.comment FROM vlan WHERE vlan.id = ? };
     my $vlan_sth = database->prepare($vlan_sql);
     $vlan_sth->execute( $vlan_id ) or die $vlan_sth->errstr;
     my ($vlan_name, $comment) = $vlan_sth->fetchrow_array;
     my $vlan = { vlan => $vlan_name, comment => $comment };
 
     # get subnet info
-    my $subnet_sql =  'SELECT subnet.id, subnet.network, subnet.prefix, '
-                    . 'subnet.gateway, subnet.broadcast, subnet.netmask, subnet.comment '
-                    . 'FROM vlan '
-                    . 'LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id '
-                    . 'LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id '
-                    . 'WHERE vlan.id = ?';
+    my $subnet_sql =  qq{ 
+                    SELECT subnet.id, subnet.network, subnet.prefix,
+                    subnet.gateway, subnet.broadcast, subnet.netmask, subnet.comment
+                    FROM vlan
+                    LEFT JOIN vlan_subnets ON vlan.id = vlan_subnets.vlan_id
+                    LEFT JOIN subnet ON vlan_subnets.subnet_id = subnet.id
+                    WHERE vlan.id = ?
+    };
     my $subnet_sth = database->prepare($subnet_sql);
     $subnet_sth->execute( $vlan_id ) or die $subnet_sth->errstr;
     my $subnets = ();
@@ -95,21 +99,25 @@ get '/view_subnet/:subnet_id' => sub {
     my $subnet_id = params->{'subnet_id'};
 
     # get subnet information
-    my $subnet_sql = 'SELECT subnet.network, subnet.gateway, subnet.broadcast, subnet.prefix, '
-                    . 'subnet.netmask, subnet.comment '
-                    . 'FROM subnet '
-                    . 'WHERE subnet.id = ?';
+    my $subnet_sql = qq{ 
+                    SELECT subnet.network, subnet.gateway, subnet.broadcast, subnet.prefix,
+                    subnet.netmask, subnet.comment
+                    FROM subnet
+                    WHERE subnet.id = ? 
+    };
     my $subnet_sth = database->prepare( $subnet_sql );
     $subnet_sth->execute( $subnet_id ) or die $subnet_sth->errstr;
     my $subnet = $subnet_sth->fetchrow_hashref;
     
     # get ips
-    my $ips_sql = 'SELECT ip.ip, server.name '
-                    . 'FROM ip_subnet '
-                    . 'LEFT JOIN ip ON ip_subnet.ip_id = ip.id '
-                    . 'LEFT JOIN server_ips ON ip.id = server_ips.ip_id '
-                    . 'LEFT JOIN server ON server_ips.server_id = server.id '
-                    . 'WHERE ip_subnet.subnet_id = ?';
+    my $ips_sql = qq{ 
+                    SELECT ip.id, ip.ip, server.id AS 'server_id', server.name
+                    FROM ip_subnet
+                    LEFT JOIN ip ON ip_subnet.ip_id = ip.id
+                    LEFT JOIN server_ips ON ip.id = server_ips.ip_id
+                    LEFT JOIN server ON server_ips.server_id = server.id
+                    WHERE ip_subnet.subnet_id = ?
+    };
     my $ips_sth = database->prepare( $ips_sql );
     $ips_sth->execute( $subnet_id ) or die $ips_sth->errstr;
 #    my $ips = $ips_sth->fetchall_hashref( 'ip.ip' );
@@ -121,7 +129,12 @@ get '/view_subnet/:subnet_id' => sub {
 };
 
 get '/view_ip' => sub {
-    my $sql = 'SELECT server.id, server.name, ip.id, ip.ip FROM server LEFT JOIN server_ips ON server.id = server_ips.server_id LEFT JOIN ip on server_ips.ip_id = ip.id';
+    my $sql = qq{ 
+                    SELECT server.id, server.name, ip.id, ip.ip 
+                    FROM server 
+                    LEFT JOIN server_ips ON server.id = server_ips.server_id 
+                    LEFT JOIN ip on server_ips.ip_id = ip.id
+    };
     my $sth = database->prepare( $sql );
     $sth->execute or die $sth->errstr;
 
@@ -159,13 +172,18 @@ get '/view_server/:server_id' => sub {
     my $server_id = params->{'server_id'};
 
     # Get server name
-    my $server_sql = 'SELECT server.name, server.comments FROM server WHERE server.id = ?';
+    my $server_sql = qq{ SELECT server.name, server.notes FROM server WHERE server.id = ? };
     my $name_sth = database->prepare( $server_sql );
-    $name_sth->execute( $server_id );
+    $name_sth->execute( $server_id ) or die $name_sth->errstr;
     my ($server_name, $comments) = $name_sth->fetchrow_array;
 
     # Get ips
-    my $sql = 'SELECT ip.ip FROM server_ips LEFT JOIN ip ON server_ips.ip_id = ip.id WHERE server_id = ?';
+    my $sql = qq{ 
+                    SELECT ip.ip 
+                    FROM server_ips 
+                    LEFT JOIN ip ON server_ips.ip_id = ip.id 
+                    WHERE server_id = ?
+    };
     my $sth = database->prepare( $sql );
     $sth->execute( $server_id ) or die $sth->errstr;
     my $ips;

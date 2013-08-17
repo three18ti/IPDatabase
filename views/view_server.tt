@@ -10,6 +10,6 @@
     <% END %>
     <dt>IPs</dt>
     <% FOREACH ip IN ips %>
-        <dd><% ip %></dd>
+        <dd><% ip.long2ip %></dd>
     <% END %>
 </dl>
