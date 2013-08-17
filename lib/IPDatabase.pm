@@ -57,12 +57,11 @@ get '/overview' => sub {
 
 get '/view_vlan/:vlan_id' => sub {
     my $vlan_id = params->{'vlan_id'};
+
     # get vlan name
     my $vlan_sql = qq{ SELECT vlan.vlan, vlan.comment FROM vlan WHERE vlan.id = ? };
     my $vlan_sth = database->prepare($vlan_sql);
     $vlan_sth->execute( $vlan_id ) or die $vlan_sth->errstr;
-    my ($vlan_name, $comment) = $vlan_sth->fetchrow_array;
-    my $vlan = { vlan => $vlan_name, comment => $comment };
 
     # get subnet info
     my $subnet_sql =  qq{ 
@@ -75,23 +74,10 @@ get '/view_vlan/:vlan_id' => sub {
     };
     my $subnet_sth = database->prepare($subnet_sql);
     $subnet_sth->execute( $vlan_id ) or die $subnet_sth->errstr;
-    my $subnets = ();
-    while ( my ($subnet_id, $network, $prefix, $gateway, $broadcast, $netmask, $comment)
-                                                        = $subnet_sth->fetchrow_array ) {
-        push @{$subnets}, {
-            id          => $subnet_id,
-            prefix      => $prefix,
-            network     => $network,
-            gateway     => $gateway,
-            netmask     => $netmask,
-            broadcast   => $broadcast,
-            comment     => $comment,
-        };
-    }
 
     template 'view_vlan.tt' => {
-        vlan    => $vlan,
-        subnets => $subnets,
+        vlan    => $vlan_sth->fetchrow_hashref,
+        subnets => $subnet_sth->fetchall_hashref,
     };
 };
 
