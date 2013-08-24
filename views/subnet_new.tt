@@ -1,1 +1,17 @@
-form here
+<table>
+    <form action="<% add_subnet_url %>" method=post class=add-entry>
+        <tr>
+            <td>IP Network Address: </td>
+            <td><input type="text" size=30 name="subnet"></td>
+        </tr>
+        <tr>
+            <td>IP Network Prefix: </td>
+            <td><input type="text" size=30 name="prefix"></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Create"></td>
+            <td></td>
+        </tr>
+    </form>
+</table>
+

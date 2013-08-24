@@ -10,6 +10,12 @@ use Dancer::Plugin::FlashMessage;
 
 our $VERSION = '0.1';
 
+before_template sub {
+    my $tokens = shift;
+
+    $tokens->{'add_subnet_url'} = uri_for '/subnet/add';
+};
+
 get '/' => sub {
     template 'index.tt';
 #    redirect '/people';
@@ -87,7 +93,7 @@ get '/view_vlan/:vlan_id' => sub {
     };
 };
 
-get '/subnet/:subnet_id' => sub {
+get '/subnet/view/:subnet_id' => sub {
     my $subnet_id = params->{'subnet_id'};
 
     # get subnet information
@@ -128,7 +134,7 @@ get '/subnet/new'   => sub {
 
 post '/subnet/add'  => sub {
     
-    my ($network, $gateway, $braodcast, $netmask, $usable, )
+    my ($network, $gateway, $broadcast, $netmask, $usable, )
         = gen_subnet( params->{'subnet'}, params->{'prefix'} );
 
     my $subnet_sql = qq{
@@ -137,7 +143,7 @@ post '/subnet/add'  => sub {
     };
     my $subnet_sth = database->prepare($subnet_sql);
     $subnet_sth->execute($network, $gateway, $broadcast, params->{'prefix'}, $netmask);
-    my $subnet_id = last_row;
+    my $subnet_id = last_row();
 
     my $ip_sql = qq{
         INSERT INTO ip(ip)
@@ -152,11 +158,11 @@ post '/subnet/add'  => sub {
     my $ip_subnet_sth = database->prepare($ip_subnet_sql);
 
     foreach my $ip ( @$usable ) {
-        $ip_sth->execute($ip)
-        my $ip_id = last_row;
+        $ip_sth->execute($ip);
+        my $ip_id = last_row();
         $ip_subnet_sth->execute($subnet_id, $ip_id);
     }
-    redirect "/subnet/$subnet_id";
+    redirect "/subnet/view/$subnet_id";
 };
 
 get '/view_ip' => sub {
@@ -263,6 +269,8 @@ sub gen_subnet {
     
     my $ip = Net::IP->new($network . $prefix);
 
+    my $netmask = ip_bintoint $ip->binmask, 4;
+
     my $network = $ip->intip;
     $ip++;
     my $gateway = $ip->intip;
@@ -275,9 +283,7 @@ sub gen_subnet {
 
     my $broadcast = pop @$usable;
 
-    my $netmask = ip_bintoint $ip->ipmask, 4;
-
-    return $network, $gateway, $braodcast, $netmask, $usable,;
+    return $network, $gateway, $broadcast, $netmask, $usable,;
 }
 
 true;
