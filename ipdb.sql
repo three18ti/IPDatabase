@@ -10,7 +10,7 @@ CREATE TABLE server (
 
 DROP TABLE IF EXISTS ip;
 CREATE TABLE ip (
-    id INTEGER PRIMARY KEY,
+    id          INTEGER PRIMARY KEY,
     ip          INTEGER UNIQUE,
     notes       VARCHAR
 );
@@ -19,10 +19,10 @@ DROP TABLE IF EXISTS subnet;
 CREATE TABLE subnet (
     id          INTEGER PRIMARY KEY,
     network     INTEGER UNIQUE,
-    gateway     VARCHAR UNIQUE,
-    broadcast   VARCHAR UNIQUE,
+    gateway     INTEGER UNIQUE,
+    broadcast   INTEGER UNIQUE,
     prefix      VARCHAR,
-    netmask     VARCHAR,
+    netmask     INTEGER,
     comment     VARCHAR
 );
 
@@ -89,9 +89,9 @@ INSERT INTO "ip" VALUES(10, 2885683715, '' );
 INSERT INTO "ip" VALUES(11, 2885683716, '' );
 INSERT INTO "ip" VALUES(12, 2885683717, '' );
 
-INSERT INTO "subnet" VALUES(1, '3232235520', '192.168.0.1', '192.168.0.255', '/24', '255.255.255.0', '');
-INSERT INTO "subnet" VALUES(2, '168427520', '10.10.0.1', '10.10.0.255', '/24', '255.255.255.0', '');
-INSERT INTO "subnet" VALUES(3, '2885683712', '172.0.10.1', '172.0.10.255', '/24', '255.255.255.0', '');
+INSERT INTO "subnet" VALUES(1, '3232235520', '3232235521', '3232235775', '/24', '4294967040', '');
+INSERT INTO "subnet" VALUES(2, '168427520', '168427521', '168427775', '/24', '4294967040', '');
+INSERT INTO "subnet" VALUES(3, '2885683712', '2885683713', '2885683967', '/24', '4294967040', '');
 
 INSERT INTO "vlan_subnets" VALUES(1, 1);
 INSERT INTO "vlan_subnets" VALUES(1, 2);
