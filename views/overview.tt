@@ -1,6 +1,6 @@
 <dl>
     <% FOREACH vlan IN vlans %>
-        <dt>VLAN: <a href="<% request.base %>view_vlan/<% vlan.id %>"><% vlan.name %></a></dt>
+        <dt>VLAN: <a href="<% request.base %>view_vlan/<% vlan.id %>"><% vlan.vlan %></a> - <% vlan.title %></dt>
         <ul>
             <% FOREACH subnet IN vlan.subnets %>
                 <% IF subnet.id %>

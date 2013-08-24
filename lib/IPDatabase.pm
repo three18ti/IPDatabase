@@ -45,17 +45,19 @@ get '/overview' => sub {
     }  
 
     # Get vlan info
-    my $vlan_sql = 'SELECT id, vlan, comment from vlan';
+    my $vlan_sql = 'SELECT id, vlan, title, comment from vlan';
     my $vlan_sth = database->prepare( $vlan_sql );
     $vlan_sth->execute or die $vlan_sth->errstr;
     my $vlans = ();
-
-    while ( my ($vlan_id, $vlan, $comment) = $vlan_sth->fetchrow_array ) {
+    
+#    push @$vlans, $_ while $vlan_sth->fetchrow_hashref;
+    while ( my ($vlan_id, $vlan, $title, $comment) = $vlan_sth->fetchrow_array ) {
         push @$vlans, { 
-            id => $vlan_id, 
-            name => $vlan, 
+            id      => $vlan_id, 
+            vlan    => $vlan,
+            title   => $title,
             comment => $comment,
-            subnets => \@{$subnets->{$vlan}}
+            subnets => \@{$subnets->{$vlan}},
         };
     }
 
@@ -127,24 +129,35 @@ get '/subnet/view/:subnet_id' => sub {
 };
 
 get '/subnet/new'   => sub {
-    template 'subnet_new.tt' => {
+    my $vlan_sql = qq{
+                    SELECT id, vlan, title
+                    FROM vlan;
+    };
 
+    my $vlan_sth = database->prepare($vlan_sql);
+    $vlan_sth->execute;
+    my $vlans = ();
+    
+    while (my $vlan = $vlan_sth->fetchrow_hashref) {
+        push @$vlans, $vlan;
+    }    
+#    push @$vlans, $_ while $vlan_sth->fetchrow_hashref;
+
+    template 'subnet_new.tt' => {
+        vlans => $vlans,
     };
 };
 
-post '/subnet/add'  => sub {
-    
-    my ($network, $gateway, $broadcast, $netmask, $usable, )
-        = gen_subnet( params->{'subnet'}, params->{'prefix'} );
+get '/subnet/add' => sub { redirect '/subnet/new' };
 
+post '/subnet/add'  => sub {
+
+    # prepare sql
     my $subnet_sql = qq{
         INSERT INTO subnet(network, gateway, broadcast, prefix, netmask)
         VALUES ( ?, ?, ?, ?, ? );
     };
     my $subnet_sth = database->prepare($subnet_sql);
-
-    $subnet_sth->execute($network, $gateway, $broadcast, params->{'prefix'}, $netmask);
-    my $subnet_id = last_row();
 
     my $ip_sql = qq{
         INSERT INTO ip(ip)
@@ -158,17 +171,36 @@ post '/subnet/add'  => sub {
     };
     my $ip_subnet_sth = database->prepare($ip_subnet_sql);
 
+    my $vlan_sql = qq {
+        INSERT INTO vlan_subnets(vlan_id, subnet_id)
+        VALUES ( ?, ?);
+    };
+    my $vlan_sth = database->prepare($vlan_sql);
+
+    # execute sql
+    my ($network, $gateway, $broadcast, $netmask, $usable, $prefix)
+        = gen_subnet( params->{'subnet'}, params->{'prefix'} );
+
+    $subnet_sth->execute($network, $gateway, $broadcast, $prefix, $netmask);
+    my $subnet_id = last_row();
+
+    $vlan_sth->execute(params->{vlan_id}, $subnet_id);
+
     foreach my $ip ( @$usable ) {
         $ip_sth->execute($ip);
         my $ip_id = last_row();
         $ip_subnet_sth->execute($subnet_id, $ip_id);
     }
+
     redirect "/subnet/view/$subnet_id";
 };
 
 sub gen_subnet {
     my $network = shift;
     my $prefix = shift;
+
+    $prefix = '/' . subnet_to_cidr($prefix) 
+        if $prefix =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
     
     my $ip = Net::IP->new($network . $prefix);
 
@@ -287,6 +319,14 @@ $Template::Stash::SCALAR_OPS->{ int2ip } = sub { ip_bintoip ip_inttobin (shift, 
 sub ip2long { unpack( "l*", pack( "l*", unpack( "N*", inet_aton( shift )))) }
 
 sub last_row { database->func('last_insert_rowid') }
+
+sub subnet_to_cidr {
+    my ($byte1, $byte2, $byte3, $byte4) = split/\./, shift;
+    my $num = ($byte1 * 16777216) + ($byte2 * 65536) + ($byte3 * 256) + $byte4;
+    my $bin = unpack("B*", pack("N", $num));
+    my $count = ($bin =~ tr/1/1/);
+    return $count;
+}
 
 true;
 

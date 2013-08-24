@@ -9,6 +9,16 @@
             <td><input type="text" size=30 name="prefix"></td>
         </tr>
         <tr>
+            <td>Vlan: </td>
+            <td>
+                <select name="vlan_id" >
+                    <% FOREACH vlan IN vlans %>
+                        <option value="<% vlan.id %>"><% vlan.vlan %> - <% vlan.title %></option>
+                    <% END %>
+                </select>
+            </td>
+        </tr>
+        <tr>
             <td><input type="submit" value="Create"></td>
             <td></td>
         </tr>

@@ -30,8 +30,8 @@ DROP TABLE IF EXISTS vlan;
 CREATE TABLE vlan (
     id          INTEGER PRIMARY KEY,
     vlan        INTEGER,
-    comment     VARCHAR,
-    notes       VARCHAR
+    title       VARCHAR,
+    comment     VARCHAR
 );
 
 DROP TABLE IF EXISTS vlan_subnets;
@@ -72,9 +72,10 @@ INSERT INTO "server" VALUES(3, 'hij-654', '' );
 INSERT INTO "server" VALUES(4, 'zxc-576', '' );
 INSERT INTO "server" VALUES(5, 'fgh-753', '' );
 
-INSERT INTO "vlan" VALUES(1, 100, 'Foo',     '' ); 
-INSERT INTO "vlan" VALUES(2, 130, 'Public',  '' ); 
-INSERT INTO "vlan" VALUES(3, 131, 'Private', '' ); 
+INSERT INTO "vlan" VALUES(1, 000, 'Unassigned', '' ); 
+INSERT INTO "vlan" VALUES(2, 100, 'Foo',        '' ); 
+INSERT INTO "vlan" VALUES(3, 130, 'Public',     '' ); 
+INSERT INTO "vlan" VALUES(4, 131, 'Private',    '' ); 
 
 INSERT INTO "ip" VALUES(1, 3232235522, '' );
 INSERT INTO "ip" VALUES(2, 3232235523, '' );
@@ -93,9 +94,9 @@ INSERT INTO "subnet" VALUES(1, '3232235520', '3232235521', '3232235775', '/24', 
 INSERT INTO "subnet" VALUES(2, '168427520', '168427521', '168427775', '/24', '4294967040', '');
 INSERT INTO "subnet" VALUES(3, '2885683712', '2885683713', '2885683967', '/24', '4294967040', '');
 
-INSERT INTO "vlan_subnets" VALUES(1, 1);
-INSERT INTO "vlan_subnets" VALUES(1, 2);
-INSERT INTO "vlan_subnets" VALUES(2, 3);
+INSERT INTO "vlan_subnets" VALUES(2, 1);
+INSERT INTO "vlan_subnets" VALUES(2, 2);
+INSERT INTO "vlan_subnets" VALUES(3, 3);
 
 INSERT INTO "ip_subnet" VALUES(1, 1);
 INSERT INTO "ip_subnet" VALUES(1, 2);
