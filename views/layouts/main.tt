@@ -17,6 +17,7 @@
     <div class=page>
         <div class = metanav >
             <% UNLESS session.logged_in %>
+                <a href = "<% request.base %>overview">Overview</a>
                 <a href = "<% request.base %>login">Log in</a>
             <% ELSE %>
                 <a href = "<% request.base %>view_ip">View IPs</a>

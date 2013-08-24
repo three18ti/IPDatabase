@@ -86,7 +86,7 @@ get '/view_vlan/:vlan_id' => sub {
     };
 };
 
-get '/view_subnet/:subnet_id' => sub {
+get '/subnet/:subnet_id' => sub {
     my $subnet_id = params->{'subnet_id'};
 
     # get subnet information
@@ -119,6 +119,14 @@ get '/view_subnet/:subnet_id' => sub {
     };
 };
 
+get '/subnet/add'   => sub {
+    my $new_subnet_sql = qq{
+        INSERT INTO 
+    };
+
+
+};
+
 get '/view_ip' => sub {
     my $sql = qq{ 
                     SELECT server.id, server.name, ip.id, ip.ip 
@@ -135,10 +143,6 @@ get '/view_ip' => sub {
 #        'entries'  => $sth->fetchall_hashref('ip'),
         'entries'   => $entries,
     };
-};
-
-get '/view_ip/:ip_id' => sub {
-    my $sql = '';
 };
 
 sub process_view_ip {
@@ -213,13 +217,44 @@ any ['get', 'post' ] => '/logout' => sub {
     redirect '/';
 };
 
-$Template::Stash::SCALAR_OPS->{ long2ip } = sub {
-    return inet_ntoa (pack ("N*", shift));    
-};
+$Template::Stash::SCALAR_OPS->{ long2ip } = sub { inet_ntoa (pack ("N*", shift)) };
 
-sub ip2long {
-    return unpack("l*", pack("l*", unpack("N*", inet_aton( shift) )));
-}
+sub ip2long { unpack( "l*", pack( "l*", unpack( "N*", inet_aton( shift )))) }
 
+sub last_row { database->func('last_insert_rowid') }
 
 true;
+
+__END__
+
+# Experiment in getting last insert id
+get '/view_ip/:ip_id' => sub {
+    my $random_letter = sub {
+        my @letters = ('a'..'z');
+        my $random_letter = $letters[int rand @letters];
+    };
+
+    my $sql = qq{
+                    SELECT server.id, server.name, ip.id, ip.ip
+                    FROM ip
+                    LEFT JOIN server_ips ON ip.id = server_ips.server_id
+                    LEFT JOIN server on server_ips.server_id = server.id
+                    WHERE ip.id = ?
+    };
+
+    my $insert_sql = qq{
+                    INSERT INTO server(name)
+                    VALUES( ? );
+    };
+
+    my $sth = database->prepare($insert_sql);
+    $sth->execute( $random_letter->() . $random_letter->() . $random_letter->() . $random_letter->());
+    my $var = database->func('last_insert_rowid');
+
+    template 'view_ip.tt' => {
+        var => $var,
+    };
+    
+};
+
+
