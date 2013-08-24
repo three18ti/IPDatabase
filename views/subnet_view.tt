@@ -1,9 +1,9 @@
 <h2>Subnet <% subnet.network.int2ip %><% subnet.prefix %></h2>
 <ul>
     <li>Comments: <% subnet.comment %></li>
-    <li><em>Gateway:</em> <% subnet.gateway %></li>
-    <li>Netmask:<% subnet.netmask %>
-    <li><em>Broadcast:</em> <% subnet.broadcast %></li>
+    <li><em>Gateway:</em> <% subnet.gateway.int2ip %></li>
+    <li>Netmask:<% subnet.netmask.int2ip %>
+    <li><em>Broadcast:</em> <% subnet.broadcast.int2ip %></li>
     <h2>IPs: </h2>
     <ul>
         <% FOREACH ip IN ips.keys.nsort %>

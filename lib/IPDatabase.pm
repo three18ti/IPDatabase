@@ -142,6 +142,7 @@ post '/subnet/add'  => sub {
         VALUES ( ?, ?, ?, ?, ? );
     };
     my $subnet_sth = database->prepare($subnet_sql);
+
     $subnet_sth->execute($network, $gateway, $broadcast, params->{'prefix'}, $netmask);
     my $subnet_id = last_row();
 
@@ -164,6 +165,30 @@ post '/subnet/add'  => sub {
     }
     redirect "/subnet/view/$subnet_id";
 };
+
+sub gen_subnet {
+    my $network = shift;
+    my $prefix = shift;
+    
+    my $ip = Net::IP->new($network . $prefix);
+
+    my $netmask = ip_bintoint $ip->binmask, 4;
+
+    my $network = $ip->intip;
+    $ip++;
+    my $gateway = $ip->intip;
+    $ip++;
+    
+    my $usable = ();
+    do {
+        push @$usable, $ip->intip;
+    } while ++$ip;
+
+    my $broadcast = pop @$usable;
+
+    return $network, $gateway, $broadcast, $netmask, $usable,;
+}
+
 
 get '/view_ip' => sub {
     my $sql = qq{ 
@@ -262,29 +287,6 @@ $Template::Stash::SCALAR_OPS->{ int2ip } = sub { ip_bintoip ip_inttobin (shift, 
 sub ip2long { unpack( "l*", pack( "l*", unpack( "N*", inet_aton( shift )))) }
 
 sub last_row { database->func('last_insert_rowid') }
-
-sub gen_subnet {
-    my $network = shift;
-    my $prefix = shift;
-    
-    my $ip = Net::IP->new($network . $prefix);
-
-    my $netmask = ip_bintoint $ip->binmask, 4;
-
-    my $network = $ip->intip;
-    $ip++;
-    my $gateway = $ip->intip;
-    $ip++;
-    
-    my $usable = ();
-    do {
-        push @$usable, $ip->intip;
-    } while ++$ip;
-
-    my $broadcast = pop @$usable;
-
-    return $network, $gateway, $broadcast, $netmask, $usable,;
-}
 
 true;
 
