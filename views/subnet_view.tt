@@ -1,4 +1,4 @@
-<h2>Subnet <% subnet.network.long2ip %><% subnet.prefix %></h2>
+<h2>Subnet <% subnet.network.int2ip %><% subnet.prefix %></h2>
 <ul>
     <li>Comments: <% subnet.comment %></li>
     <li><em>Gateway:</em> <% subnet.gateway %></li>
@@ -7,7 +7,7 @@
     <h2>IPs: </h2>
     <ul>
         <% FOREACH ip IN ips.keys.nsort %>
-            <li><a href="<% request.base %>view_ip/<% ips.$ip.id %>"><% ips.$ip.ip.long2ip %></a>
+            <li><a href="<% request.base %>view_ip/<% ips.$ip.id %>"><% ips.$ip.ip.int2ip %></a>
                 <a href="<% request.base %>view_server/<% ips.$ip.server_id %>"><% ips.$ip.name %></a></li>
         <% END %>
     </ul>

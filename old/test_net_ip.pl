@@ -7,7 +7,7 @@ use Math::BigInt;
 use Net::IP qw(:PROC);
 
 # OO Interface
-my $ip = Net::IP->new('192.168.0.0/24') or die Net::IP::Error;
+my $ip = Net::IP->new('192.168.0.0/29') or die Net::IP::Error;
 
 say "IP  : "        . $ip->ip;
 say "Sho : "        . $ip->short;
@@ -27,9 +27,11 @@ say "Find Prefixes: ";
 my @list = $ip->find_prefixes('192.168.0.255');
 #map { say } $ip->find_prefixes('192.168.1.24');
 map { say } @list;
-#do {
-#    say $ip->ip;
-#} while ++$ip;
+do {
+    my $this_ip = $ip->intip;
+    say $this_ip;
+    say ip_bintoip ip_inttobin ($this_ip, 4), 4;
+} while ++$ip;
 
 
 # Procedureal Inteface

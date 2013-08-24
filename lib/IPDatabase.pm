@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Template::Stash;
 use Dancer ':syntax';
+use Net::IP qw(:PROC);
 use Dancer::Plugin::Database;
 use Dancer::Plugin::FlashMessage;
 
@@ -113,18 +114,49 @@ get '/subnet/:subnet_id' => sub {
     $ips_sth->execute( $subnet_id ) or die $ips_sth->errstr;
 #    my $ips = $ips_sth->fetchall_hashref( 'ip.ip' );
 
-    template 'view_subnet.tt' => {
+    template 'subnet_view.tt' => {
         subnet  => $subnet,
         ips     => $ips_sth->fetchall_hashref( 'ip' ),
     };
 };
 
-get '/subnet/add'   => sub {
-    my $new_subnet_sql = qq{
-        INSERT INTO 
+get '/subnet/new'   => sub {
+    template 'subnet_new.tt' => {
+
     };
+};
 
+post '/subnet/add'  => sub {
+    
+    my ($network, $gateway, $braodcast, $netmask, $usable, )
+        = gen_subnet( params->{'subnet'}, params->{'prefix'} );
 
+    my $subnet_sql = qq{
+        INSERT INTO subnet(network, gateway, broadcast, prefix, netmask)
+        VALUES ( ?, ?, ?, ?, ? );
+    };
+    my $subnet_sth = database->prepare($subnet_sql);
+    $subnet_sth->execute($network, $gateway, $broadcast, params->{'prefix'}, $netmask);
+    my $subnet_id = last_row;
+
+    my $ip_sql = qq{
+        INSERT INTO ip(ip)
+        VALUES ( ? )
+    };
+    my $ip_sth = database->prepare($ip_sql);
+
+    my $ip_subnet_sql = qq{
+        INSERT INTO ip_subnet(subnet_id, ip_id)
+        VALUES ( ?, ? )
+    };
+    my $ip_subnet_sth = database->prepare($ip_subnet_sql);
+
+    foreach my $ip ( @$usable ) {
+        $ip_sth->execute($ip)
+        my $ip_id = last_row;
+        $ip_subnet_sth->execute($subnet_id, $ip_id);
+    }
+    redirect "/subnet/$subnet_id";
 };
 
 get '/view_ip' => sub {
@@ -218,10 +250,35 @@ any ['get', 'post' ] => '/logout' => sub {
 };
 
 $Template::Stash::SCALAR_OPS->{ long2ip } = sub { inet_ntoa (pack ("N*", shift)) };
+$Template::Stash::SCALAR_OPS->{ int2ip } = sub { ip_bintoip ip_inttobin (shift, 4), 4 };
+
 
 sub ip2long { unpack( "l*", pack( "l*", unpack( "N*", inet_aton( shift )))) }
 
 sub last_row { database->func('last_insert_rowid') }
+
+sub gen_subnet {
+    my $network = shift;
+    my $prefix = shift;
+    
+    my $ip = Net::IP->new($network . $prefix);
+
+    my $network = $ip->intip;
+    $ip++;
+    my $gateway = $ip->intip;
+    $ip++;
+    
+    my $usable = ();
+    do {
+        push @$usable, $ip->intip;
+    } while ++$ip;
+
+    my $broadcast = pop @$usable;
+
+    my $netmask = ip_bintoint $ip->ipmask, 4;
+
+    return $network, $gateway, $braodcast, $netmask, $usable,;
+}
 
 true;
 

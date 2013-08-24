@@ -4,7 +4,7 @@
         <ul>
             <% FOREACH subnet IN vlan.subnets %>
                 <% IF subnet.id %>
-                    <dd><li><a href="<% request.base %>subnet/<% subnet.id %>"><% subnet.network.long2ip %><% subnet.prefix %></a></li></dd>
+                    <dd><li><a href="<% request.base %>subnet/<% subnet.id %>"><% subnet.network.int2ip %><% subnet.prefix %></a></li></dd>
                 <% END %>
             <% END %>
         </ul>
